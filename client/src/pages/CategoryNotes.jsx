@@ -1,0 +1,67 @@
+import React, { useState, useEffect } from 'react';
+import { List, Card, Tag, Layout } from 'antd';
+import { getNotesByCategory } from '@/api/noteApi';
+import { useStore } from '@/store/userStore';
+import { useNavigate, useParams } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+
+const CategoryNotes = () => {
+  const { user } = useStore();
+  const navigate = useNavigate();
+  const { categoryId } = useParams();
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    if (!user) navigate('/login');
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchNotesByCategory = async () => {
+      try {
+        const fetchedNotes = await getNotesByCategory(user.id, categoryId);
+        console.log(categoryId);
+        console.log('data', fetchedNotes.data);
+        setNotes(fetchedNotes.data);
+      } catch (error) {
+        console.error('Failed to fetch notes by category:', error);
+        alert('获取笔记失败');
+      }
+    };
+    fetchNotesByCategory();
+  }, [categoryId]);
+
+  if (!notes) return <div>Loading...</div>;
+  return (
+    <Layout>
+      <Navbar />
+      <Layout style={{ marginLeft: 200 }}>
+        <Layout.Content
+          style={{ padding: '24px', minHeight: '100vh', background: '#fff' }}
+        >
+          <h1>分类笔记列表</h1>
+          <List
+            grid={{ gutter: 16, column: 4 }}
+            dataSource={notes}
+            renderItem={(item) => (
+              <Card className="note-card hoverable">
+                <Card.Meta title={item.title} />
+                {item.tags && item.tags.length > 0 && (
+                  <div className="my-4">
+                    {item.tags.map((tag) => (
+                      <Tag color="cyan" key={tag}>
+                        {tag}
+                      </Tag>
+                    ))}
+                  </div>
+                )}
+                <a href={`/notes/${item.id}`}>查看详情</a>
+              </Card>
+            )}
+          />
+        </Layout.Content>
+      </Layout>
+    </Layout>
+  );
+};
+
+export default CategoryNotes;

@@ -1,9 +1,12 @@
-import React from 'react';
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import AppRoutes from "@/routes";
 const App = () => {
   return (
-    <>
-      <h1>我的笔记应⽤</h1>
-    </>
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 };
+
 export default App;
