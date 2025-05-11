@@ -99,7 +99,7 @@ const CommentList = ({ noteId }) => {
               title={<span>{item.username}</span>}
               description={
                 <div>
-                  <div>11{item.content}</div>
+                  <div>{item.content}</div>
                   <div style={{ fontSize: '12px', color: '#999' }}>
                     {new Date(item.created_at).toLocaleString()}
                   </div>

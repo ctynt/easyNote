@@ -1,11 +1,11 @@
-import axiosInstance from "./axiosInstance";
+import axiosInstance from './axiosInstance';
 
 export const createCategory = async (categoryData) => {
-  return axiosInstance.post("/categories", categoryData);
+  return axiosInstance.post('/categories', categoryData);
 };
 
-export const getCategories = async () => {
-  return axiosInstance.get("/categories");
+export const getCategories = async (userId) => {
+  return axiosInstance.get(`/categories/user/${userId}`);
 };
 
 export const getCategory = async (categoryId) => {

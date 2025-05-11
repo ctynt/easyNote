@@ -12,9 +12,19 @@ import {
   Collapse,
   Popover,
   message,
+  FloatButton,
 } from 'antd';
+import {
+  VerticalAlignTopOutlined,
+  VerticalAlignBottomOutlined,
+} from '@ant-design/icons';
 import TurndownService from 'turndown';
-import { HomeOutlined, TranslationOutlined } from '@ant-design/icons';
+import {
+  HomeOutlined,
+  TranslationOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons';
+import { generateShareLink, copyToClipboard } from '@/utils/shareUtils';
 import {
   getNotesByCategory,
   deleteNote,
@@ -92,6 +102,17 @@ const CategoryNotes = () => {
     } catch (error) {
       console.error('Failed to delete note:', error);
       alert('删除笔记失败');
+    }
+  };
+
+  // 处理分享功能
+  const handleShare = async (noteId) => {
+    const shareLink = generateShareLink(noteId);
+    const success = await copyToClipboard(shareLink);
+    if (success) {
+      message.success('分享链接已复制到剪贴板');
+    } else {
+      message.error('复制失败，请手动复制');
     }
   };
 
@@ -176,6 +197,7 @@ const CategoryNotes = () => {
           e.stopPropagation();
           navigate(`/notes/edit/${item.id}`);
         }}
+        style={{ marginRight: '8px' }}
       >
         编辑
       </Button>
@@ -187,8 +209,20 @@ const CategoryNotes = () => {
           setModalVisible(true);
           setSelectedNoteId(item.id);
         }}
+        style={{ marginRight: '8px' }}
       >
         删除
+      </Button>
+      <Button
+        type="link"
+        icon={<ShareAltOutlined />}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleShare(item.id);
+        }}
+        style={{ marginRight: '8px' }}
+      >
+        分享
       </Button>
     </>
   );
@@ -268,6 +302,43 @@ const CategoryNotes = () => {
         >
           {selectedNote ? (
             <>
+              <FloatButton.Group
+                shape="circle"
+                style={{
+                  right: 24,
+                  bottom: 24,
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                }}
+              >
+                <FloatButton
+                  icon={<VerticalAlignTopOutlined />}
+                  tooltip="回到顶部"
+                  onClick={() => {
+                    const contentElement =
+                      document.querySelector('.article-content');
+                    if (contentElement) {
+                      contentElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                      });
+                    }
+                  }}
+                />
+                <FloatButton
+                  icon={<VerticalAlignBottomOutlined />}
+                  tooltip="到达底部"
+                  onClick={() => {
+                    const commentsElement =
+                      document.querySelector('.article-comments');
+                    if (commentsElement) {
+                      commentsElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'end',
+                      });
+                    }
+                  }}
+                />
+              </FloatButton.Group>
               <div
                 style={{
                   padding: '12px 24px',
@@ -285,6 +356,27 @@ const CategoryNotes = () => {
                   {selectedNote.title}
                 </Typography.Title>
                 <Space>
+                  <Button
+                    type="text"
+                    danger
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setModalVisible(true);
+                      setSelectedNoteId(selectedNote.id);
+                    }}
+                  >
+                    删除
+                  </Button>
+                  <Button
+                    type="text"
+                    icon={<ShareAltOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare(selectedNote.id);
+                    }}
+                  >
+                    分享
+                  </Button>
                   <Button type="text" onClick={handleExportMarkdown}>
                     导出为MD
                   </Button>

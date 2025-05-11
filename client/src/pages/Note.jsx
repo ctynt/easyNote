@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Layout, Button, message, Divider, Input, Space } from 'antd';
-import { getNote, updateNote, deleteNote } from '@/api/noteApi';
+import { Tag, Layout, Button, message, Divider } from 'antd';
+import { ShareAltOutlined } from '@ant-design/icons';
+import { getNote } from '@/api/noteApi';
+import { generateShareLink, copyToClipboard } from '@/utils/shareUtils';
 import { useStore } from '@/store/userStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import TiptapViewer from '@/components/TiptapViewer';
 import OutlineExtractor from '@/components/OutlineExtractor';
 import TurndownService from 'turndown';
-import CommentSection from '@/components/CommentSection';
+import CommentList from '@/components/CommentList';
 
 const { Content, Sider } = Layout;
 
@@ -18,6 +20,17 @@ const Note = () => {
   const [note, setNote] = useState(null);
 
   // 导出笔记为Markdown文件
+  // 处理分享功能
+  const handleShare = async () => {
+    const shareLink = generateShareLink(id);
+    const success = await copyToClipboard(shareLink);
+    if (success) {
+      message.success('分享链接已复制到剪贴板');
+    } else {
+      message.error('复制失败，请手动复制');
+    }
+  };
+
   const handleExportMarkdown = () => {
     if (!note) return;
 
@@ -98,12 +111,20 @@ const Note = () => {
                 {note.user_id === currentUser?.id ? (
                   <>
                     <Button
+                      icon={<ShareAltOutlined />}
+                      onClick={handleShare}
+                      style={{ marginRight: '8px' }}
+                    >
+                      分享
+                    </Button>
+                    <Button
                       type="text"
                       onClick={() => navigate(`/notes/edit/${id}`)}
                       style={{ fontSize: '16px' }}
                     >
                       编辑笔记
                     </Button>
+
                     <Button
                       type="text"
                       onClick={handleExportMarkdown}
@@ -146,7 +167,7 @@ const Note = () => {
               </div>
               <TiptapViewer content={note.content} />
               <Divider style={{ margin: '24px 0' }} />
-              {/* <CommentSection noteId={id} /> */}
+              <CommentList noteId={id} />
             </div>
           </div>
           <Sider

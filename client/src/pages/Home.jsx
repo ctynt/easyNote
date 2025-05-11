@@ -22,8 +22,6 @@ const Home = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [createCategoryModal, setCreateCategoryModal] = useState(false);
   const [categoryNameInput, setCategoryNameInput] = useState('');
 
@@ -41,7 +39,7 @@ const Home = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await getCategories();
+      const response = await getCategories(user.id);
       setCategories(response.data);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
@@ -145,7 +143,7 @@ const Home = () => {
             open={createCategoryModal}
             onOk={async () => {
               try {
-                await createCategory({ name: categoryNameInput });
+                await createCategory({ name: categoryNameInput }, user.id);
                 message.success('知识库创建成功');
                 await fetchCategories();
                 setCreateCategoryModal(false);
