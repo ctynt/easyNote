@@ -114,11 +114,13 @@ const CreateNote = () => {
             />
           </div>
         </div>
-        <NoteForm
-          onSubmit={handleSubmit}
-          submitButtonText="创建笔记"
-          initialValues={formData}
-        />
+        <div style={{ padding: '24px', background: '#fff' }}>
+          <NoteForm
+            onSubmit={handleSubmit}
+            submitButtonText="创建笔记"
+            initialValues={formData}
+          />
+        </div>
       </Layout.Content>
     </Layout>
   );

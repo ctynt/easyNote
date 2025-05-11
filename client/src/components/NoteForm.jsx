@@ -68,7 +68,6 @@ const NoteForm = ({ initialValues, onSubmit, submitButtonText }) => {
       className="note-form"
       style={{
         background: '#fff',
-        padding: '24px',
         borderRadius: '8px',
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
       }}
@@ -91,14 +90,10 @@ const NoteForm = ({ initialValues, onSubmit, submitButtonText }) => {
 
       <Form.Item
         name="categoryId"
-        rules={[{ required: true, message: '请选择笔记类型' }]}
+        rules={[{ required: true, message: '请选择知识库' }]}
         style={{ marginBottom: '12px' }}
       >
-        <Select
-          placeholder="请选择笔记类型"
-          style={{ width: '200px' }}
-          bordered={false}
-        >
+        <Select placeholder="请选择知识库" style={{ width: '200px' }}>
           {categories.map((category) => (
             <Select.Option key={category.id} value={category.id}>
               {category.name}

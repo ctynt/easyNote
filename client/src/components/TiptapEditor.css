@@ -1,21 +1,25 @@
 .tiptap-editor-wrapper {
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
   background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .tiptap-menu {
   display: flex;
   flex-wrap: wrap;
-  padding: 8px;
-  border-bottom: 1px solid #e8e8e8;
-  background-color: #f9f9f9;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .tiptap-menu button {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   margin: 2px;
   border: none;
   background: transparent;
@@ -25,21 +29,23 @@
   align-items: center;
   justify-content: center;
   color: #595959;
+  transition: all 0.2s;
 }
 
 .tiptap-menu button:hover {
-  background-color: #e6f7ff;
+  background-color: var(--hover-color);
+  color: #fff;
 }
 
 .tiptap-menu button.is-active {
-  background-color: #e6f7ff;
-  color: #1890ff;
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 .tiptap-menu .divider {
   width: 1px;
   height: 24px;
-  background-color: #e8e8e8;
+  background-color: var(--border-color);
   margin: 0 8px;
   align-self: center;
 }
@@ -70,21 +76,21 @@
 }
 
 .tiptap-editor-content blockquote {
-  border-left: 4px solid #ddd;
+  border-left: 4px solid var(--accent-color);
   padding-left: 16px;
   margin-left: 0;
-  color: #666;
+  color: var(--accent-color);
 }
 
 .tiptap-editor-content pre {
-  background-color: #f5f5f5;
+  background-color: var(--background-color);
   border-radius: 4px;
   padding: 8px;
   overflow-x: auto;
 }
 
 .tiptap-editor-content code {
-  background-color: #f5f5f5;
+  background-color: var(--background-color);
   border-radius: 4px;
   padding: 2px 4px;
   font-family: monospace;
@@ -109,7 +115,7 @@
 
 .tiptap-editor-content th,
 .tiptap-editor-content td {
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--border-color);
   padding: 8px;
   text-align: left;
   position: relative;
@@ -118,12 +124,13 @@
 }
 
 .tiptap-editor-content th {
-  background-color: #f5f5f5;
+  background-color: var(--primary-color);
+  color: #fff;
   font-weight: bold;
 }
 
 .tiptap-editor-content .selectedCell {
-  background-color: #e6f7ff;
+  background-color: var(--background-color);
 }
 
 .tiptap-editor-content .column-resize-handle {
@@ -147,7 +154,7 @@
 }
 
 .tiptap-editor-content a {
-  color: #1890ff;
+  color: var(--primary-color);
   text-decoration: none;
 }
 
@@ -157,7 +164,7 @@
 
 .tiptap-editor-content hr {
   border: none;
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid var(--border-color);
   margin: 16px 0;
 }
 

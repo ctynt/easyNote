@@ -1,12 +1,12 @@
-import pool from '../config/db.js';
+import pool from "../config/db.js";
 
 //创建笔记
 export const createNote = async (req, res) => {
   try {
     const { userId, title, content, categoryId, tags } = req.body;
     const [result] = await pool.query(
-      'INSERT INTO notes (user_id,title,content,category_id,tags)VALUES (?,?,?,?,?)',
-      [userId, title, content, categoryId, JSON.stringify(tags)],
+      "INSERT INTO notes (user_id,title,content,category_id,tags)VALUES (?,?,?,?,?)",
+      [userId, title, content, categoryId, JSON.stringify(tags)]
     );
     res.status(201).json({
       id: result.insertId,
@@ -25,9 +25,10 @@ export const createNote = async (req, res) => {
 export const getNotes = async (req, res) => {
   try {
     const { userId } = req.params;
-    const [rows] = await pool.query('SELECT * FROM notes WHERE user_id = ?', [
-      userId,
-    ]);
+    const [rows] = await pool.query(
+      "SELECT * FROM notes WHERE user_id = ? ORDER BY updated_at DESC",
+      [userId]
+    );
     res.status(200).json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -36,10 +37,16 @@ export const getNotes = async (req, res) => {
 
 export const getNotesList = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM notes');
+    const [rows] = await pool.query(
+      `SELECT n.*, u.username, u.avatar_url, 
+      (SELECT COUNT(*) FROM comments c WHERE c.note_id = n.id) as comment_count 
+      FROM notes n 
+      LEFT JOIN users u ON n.user_id = u.id 
+      ORDER BY n.updated_at DESC`
+    );
     res.status(200).json(rows);
   } catch (error) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -48,8 +55,8 @@ export const getNotesByCategory = async (req, res) => {
   try {
     const { userId, categoryId } = req.params;
     const [rows] = await pool.query(
-      'SELECT * FROM notes WHERE user_id = ? AND category_id = ?',
-      [userId, categoryId],
+      "SELECT * FROM notes WHERE user_id = ? AND category_id = ?",
+      [userId, categoryId]
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -61,11 +68,11 @@ export const getNotesByCategory = async (req, res) => {
 export const getNote = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query('SELECT * FROM notes WHERE id = ?', [id]);
+    const [rows] = await pool.query("SELECT * FROM notes WHERE id = ?", [id]);
     if (rows.length > 0) {
       res.status(200).json(rows[0]);
     } else {
-      res.status(404).json({ error: 'Note not found' });
+      res.status(404).json({ error: "Note not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -78,8 +85,8 @@ export const updateNote = async (req, res) => {
     const { id } = req.params;
     const { title, content, categoryId, tags } = req.body;
     await pool.query(
-      'UPDATE notes SET title = ?,content = ?,category_id = ?,tags = ? WHERE id = ?',
-      [title, content, categoryId, JSON.stringify(tags), id],
+      "UPDATE notes SET title = ?,content = ?,category_id = ?,tags = ? WHERE id = ?",
+      [title, content, categoryId, JSON.stringify(tags), id]
     );
     res.status(200).json({ id, title, content, categoryId, tags });
   } catch (error) {
@@ -91,8 +98,8 @@ export const updateNote = async (req, res) => {
 export const deleteNote = async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query('DELETE FROM notes WHERE id = ?', [id]);
-    res.status(200).json({ message: 'Note deleted' });
+    await pool.query("DELETE FROM notes WHERE id = ?", [id]);
+    res.status(200).json({ message: "Note deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

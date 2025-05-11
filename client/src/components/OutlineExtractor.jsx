@@ -27,14 +27,18 @@ const OutlineExtractor = ({ content, onHeadingClick }) => {
 
   // 处理标题数据，生成大纲结构
   const outlineItems = Array.from(headings).map((heading, index) => {
-    // 使用已有ID或生成与TiptapViewer组件一致的ID格式
     const headingText = heading.textContent.trim();
     const headingId =
       heading.id ||
-      `heading-${headingText
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w\-]/g, '')}-${index}`;
+      (() => {
+        if (!headingText) return `heading-${index}`;
+        const sanitizedText = headingText
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\-]/g, '');
+        return `heading-${sanitizedText}-${index}`;
+      })();
 
     if (!heading.id) {
       heading.id = headingId;

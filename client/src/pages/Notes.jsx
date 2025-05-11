@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react';
-import { List, Card, Tag, Button, Modal, message, Space, Layout } from 'antd';
+import { Button, message, Layout } from 'antd';
 import { getNotes, deleteNote } from '@/api/noteApi';
+import { getCategories } from '@/api/categoryApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
+import NoteList from '@/components/NoteList';
 import React from 'react';
+
 const Notes = () => {
   const navigate = useNavigate();
   const { user } = useStore();
   const [notes, setNotes] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedNoteId, setSelectedNoteId] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    if (!user) navigate('/login');
-  }, [navigate]);
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   const fetchNotes = async () => {
     try {
@@ -22,13 +26,26 @@ const Notes = () => {
       setNotes(fetchNotesData.data);
     } catch (error) {
       console.error('Failed to fetch notes:', error);
-      alert('获取笔记失败');
+      message.error('获取笔记失败');
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await getCategories();
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      message.error('获取分类失败');
     }
   };
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    if (user && user.id) {
+      fetchNotes();
+      fetchCategories();
+    }
+  }, [user]);
 
   const handleDeleteNote = async (noteId) => {
     try {
@@ -54,51 +71,11 @@ const Notes = () => {
               创建笔记
             </Button>
           </div>
-          <List
-            grid={{ gutter: 16, column: 4 }}
-            dataSource={notes}
-            className="p-4"
-            renderItem={(item) => (
-              <Card className="bg-blue-100 m-2" hoverable>
-                <Card.Meta title={item.title} />
-                <div className="my-4">
-                  {item.tags.map((tag) => (
-                    <Tag color="cyan" key={tag}>
-                      {tag}
-                    </Tag>
-                  ))}
-                </div>
-                <Space>
-                  <a href={`/notes/${item.id}`}>点击查看详情</a>
-
-                  <Button
-                    type="primary"
-                    onClick={() => {
-                      setModalVisible(true);
-                      setSelectedNoteId(item.id);
-                    }}
-                  >
-                    删除
-                  </Button>
-                </Space>
-              </Card>
-            )}
+          <NoteList
+            notes={notes}
+            categories={categories}
+            onDeleteNote={handleDeleteNote}
           />
-          <Modal
-            title="确认删除"
-            open={modalVisible}
-            onOk={async () => {
-              await handleDeleteNote(selectedNoteId);
-              setModalVisible(false);
-              setSelectedNoteId(null);
-            }}
-            onCancel={() => {
-              setModalVisible(false);
-              setSelectedNoteId(null);
-            }}
-          >
-            <p>确定要删除这条笔记吗？此操作不可恢复。</p>
-          </Modal>
         </Layout.Content>
       </Layout>
     </Layout>

@@ -14,6 +14,8 @@ import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
+import { translateText } from '@/api/translateApi';
+import { message } from 'antd';
 import './TiptapEditor.css';
 
 const MenuBar = ({ editor }) => {
@@ -350,6 +352,47 @@ const MenuBar = ({ editor }) => {
             d="M302.638545 932.677818v-93.090909h709.02691v93.090909z m0-297.472v-93.090909h709.02691v93.090909z m-256-291.467636L115.432727 281.041455l98.071273 107.706181 261.678545-295.610181 69.818182 61.672727-330.472727 373.201454z m592.663273-6.050909v-93.090909h372.363637v93.090909z"
             p-id="7687"
           ></path>
+        </svg>
+      </button>
+      <div className="divider"></div>
+      <button
+        onClick={async () => {
+          const selection = editor.state.selection;
+          const text = editor.state.doc.textBetween(
+            selection.from,
+            selection.to,
+            ' ',
+          );
+          if (!text) {
+            message.warning('请先选择要翻译的文本');
+            return;
+          }
+          try {
+            message.loading('正在翻译...', 0);
+            const translatedText = await translateText(text);
+            editor.chain().focus().insertContent(translatedText).run();
+            message.destroy();
+            message.success('翻译完成');
+          } catch (error) {
+            message.destroy();
+            message.error('翻译失败，请稍后重试');
+          }
+        }}
+        title="翻译选中文本"
+      >
+        <svg
+          t="1746711427566"
+          className="icon"
+          viewBox="0 0 1024 1024"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+        >
+          <path
+            d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m146.4 612.3c-2.8 4.1-7.4 6.6-12.3 6.6-2.9 0-5.8-0.9-8.3-2.6l-125.8-86.6c-4.1-2.8-6.6-7.4-6.6-12.3V352c0-8.3 6.7-15 15-15s15 6.7 15 15v219.8l118.3 81.4c6.9 4.7 8.6 14.1 3.9 21z"
+            fill="currentColor"
+          />
         </svg>
       </button>
       <button

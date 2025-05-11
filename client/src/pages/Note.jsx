@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Layout, Button, message, Divider } from 'antd';
-import { getNote } from '@/api/noteApi';
+import { Tag, Layout, Button, message, Divider, Input, Space } from 'antd';
+import { getNote, updateNote, deleteNote } from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import TiptapViewer from '@/components/TiptapViewer';
 import OutlineExtractor from '@/components/OutlineExtractor';
 import TurndownService from 'turndown';
+import CommentSection from '@/components/CommentSection';
 
 const { Content, Sider } = Layout;
 
 const Note = () => {
-  const { user } = useStore();
+  const { user: currentUser } = useStore();
   const navigate = useNavigate();
   const { id } = useParams();
   const [note, setNote] = useState(null);
@@ -53,8 +54,8 @@ const Note = () => {
   };
 
   useEffect(() => {
-    if (!user) navigate('/login');
-  }, [navigate, user]);
+    if (!currentUser) navigate('/login');
+  }, [navigate, currentUser]);
 
   useEffect(() => {
     const fetchNoteDetails = async () => {
@@ -94,21 +95,24 @@ const Note = () => {
           >
             <div className="flex justify-between items-center">
               <div style={{ marginBottom: '10px' }}>
-                <Button
-                  type="text"
-                  onClick={() => navigate(`/notes/edit/${id}`)}
-                  style={{ fontSize: '16px' }}
-                >
-                  编辑笔记
-                </Button>
-
-                <Button
-                  type="text"
-                  onClick={handleExportMarkdown}
-                  style={{ fontSize: '16px' }}
-                >
-                  导出为MD
-                </Button>
+                {note.user_id === currentUser?.id ? (
+                  <>
+                    <Button
+                      type="text"
+                      onClick={() => navigate(`/notes/edit/${id}`)}
+                      style={{ fontSize: '16px' }}
+                    >
+                      编辑笔记
+                    </Button>
+                    <Button
+                      type="text"
+                      onClick={handleExportMarkdown}
+                      style={{ fontSize: '16px', marginLeft: '10px' }}
+                    >
+                      导出为MD
+                    </Button>
+                  </>
+                ) : null}
               </div>
             </div>
 
@@ -141,6 +145,8 @@ const Note = () => {
                   ))}
               </div>
               <TiptapViewer content={note.content} />
+              <Divider style={{ margin: '24px 0' }} />
+              {/* <CommentSection noteId={id} /> */}
             </div>
           </div>
           <Sider

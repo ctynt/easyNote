@@ -18,13 +18,13 @@ const HeadingID = Extension.create({
 });
 
 const generateHeadingId = (text, index) => {
-  // 简化ID生成逻辑，确保与OutlineExtractor组件中的ID格式一致
-  return text
-    ? `heading-${text
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w\-]/g, '')}-${index}`
-    : `heading-${index}`;
+  if (!text) return `heading-${index}`;
+  const sanitizedText = text
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]/g, '');
+  return `heading-${sanitizedText}-${index}`;
 };
 
 const TiptapViewer = ({ content }) => {

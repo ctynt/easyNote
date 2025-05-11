@@ -2,8 +2,9 @@
   display: flex;
   justify-self: space-between;
   align-items: center;
-  background-color: #408fae;
+  background-color: var(--primary-color);
   padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav-menu {
@@ -22,12 +23,20 @@
 }
 
 .nav-menu li.active a {
-  color: #408fae;
-  background-color: #fff;
+  color: var(--primary-color);
+  background-color: var(--background-color);
+  border-radius: 4px;
 }
 
 .login-link {
-  color: #799ecf;
+  color: var(--background-color);
   text-decoration: none;
   font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.login-link:hover {
+  background-color: var(--hover-color);
 }

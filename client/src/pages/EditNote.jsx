@@ -58,11 +58,13 @@ const EditNote = () => {
         }}
       >
         <Layout.Content style={{ padding: '24px', background: '#f5f5f5' }}>
-          <NoteForm
-            initialValues={note}
-            onSubmit={handleSubmit}
-            submitButtonText="保存笔记"
-          />
+          <div style={{ padding: '24px', backgroundColor: '#fff' }}>
+            <NoteForm
+              initialValues={note}
+              onSubmit={handleSubmit}
+              submitButtonText="保存笔记"
+            />
+          </div>
         </Layout.Content>
       </Layout>
     </Layout>
