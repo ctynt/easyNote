@@ -1,7 +1,7 @@
 import axiosInstance from './axiosInstance';
 
 // 翻译文本
-export const translateText = async (text, from = 'auto', to = 'en') => {
+export const translateText = async (text, from, to) => {
   try {
     const targetLang = to || (text.match(/[\u4e00-\u9fa5]/) ? 'en' : 'zh');
     const sourceLang = from || (text.match(/[\u4e00-\u9fa5]/) ? 'zh' : 'en');

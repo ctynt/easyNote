@@ -20,7 +20,7 @@ const generateSign = (text, salt) => {
 // 翻译文本控制器
 export const translateText = async (req, res) => {
   try {
-    const { text, from = "auto", to = "zh" } = req.body;
+    const { text, from, to } = req.body;
     const targetLang = to || (text.match(/[\u4e00-\u9fa5]/) ? "en" : "zh");
     const sourceLang = from || (text.match(/[\u4e00-\u9fa5]/) ? "zh" : "en");
     const salt = generateSalt();
