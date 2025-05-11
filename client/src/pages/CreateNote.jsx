@@ -94,7 +94,7 @@ const CreateNote = () => {
   return (
     <Layout>
       <Navbar />
-      <Layout.Content className="p-4" style={{ marginLeft: '200px' }}>
+      <Layout.Content className="p-4" style={{ marginLeft: '250px' }}>
         <div className="flex justify-between items-center mb-6">
           <h1>创建笔记</h1>
           <div>

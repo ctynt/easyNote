@@ -81,7 +81,7 @@ const Home = () => {
   return (
     <Layout>
       <Navbar />
-      <Layout style={{ marginLeft: 200 }}>
+      <Layout style={{ marginLeft: 250 }}>
         <Layout.Content
           className="p-6 bg-gray-50"
           style={{ overflow: 'hidden' }}

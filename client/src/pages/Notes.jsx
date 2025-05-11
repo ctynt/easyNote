@@ -61,7 +61,7 @@ const Notes = () => {
   return (
     <Layout>
       <Navbar />
-      <Layout style={{ marginLeft: 200 }}>
+      <Layout style={{ marginLeft: 250 }}>
         <Layout.Content
           style={{ padding: '24px', minHeight: '100vh', background: '#fff' }}
         >

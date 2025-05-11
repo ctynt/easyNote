@@ -1,8 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Modal } from 'antd';
-import { HomeOutlined, BookOutlined, FolderOutlined } from '@ant-design/icons';
+import {
+  Layout,
+  Menu,
+  Button,
+  Modal,
+  Input,
+  List,
+  Tag,
+  Space,
+  Row,
+  Col,
+} from 'antd';
+import {
+  HomeOutlined,
+  BookOutlined,
+  FolderOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import { getCategories } from '@/api/categoryApi';
+import { getNotes } from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 
 const { Sider } = Layout;
@@ -13,11 +30,15 @@ const Navbar = () => {
   const location = useLocation();
   const [categories, setCategories] = useState([]);
   const [openKeys, setOpenKeys] = useState([]); // 👈 控制展开子菜单
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await getCategories();
+        const response = await getCategories(user.id);
         setCategories(response.data);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -25,6 +46,27 @@ const Navbar = () => {
     };
     fetchCategories();
   }, []);
+
+  const handleSearch = async () => {
+    if (!searchKeyword.trim()) return;
+    setSearching(true);
+    try {
+      const response = await getNotes(user.id);
+      const filteredNotes = response.data.filter(
+        (note) =>
+          note.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+          note.content.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+          note.tags.some((tag) =>
+            tag.toLowerCase().includes(searchKeyword.toLowerCase()),
+          ),
+      );
+      setSearchResults(filteredNotes);
+    } catch (error) {
+      console.error('搜索失败:', error);
+    } finally {
+      setSearching(false);
+    }
+  };
 
   const handleLogout = () => {
     Modal.confirm({
@@ -69,8 +111,10 @@ const Navbar = () => {
 
   return (
     <Sider
+      width={250}
       style={{
         height: '100vh',
+
         position: 'fixed',
         left: 0,
         backgroundColor: '#fff',
@@ -118,8 +162,84 @@ const Navbar = () => {
             icon: <BookOutlined />,
             onClick: () => navigate('/explore'),
           },
+          {
+            key: 'search',
+            label: '搜索',
+            icon: <SearchOutlined />,
+            onClick: () => setSearchModalVisible(true),
+          },
         ]}
       />
+
+      <Modal
+        title="搜索笔记"
+        open={searchModalVisible}
+        onCancel={() => {
+          setSearchModalVisible(false);
+          setSearchKeyword('');
+          setSearchResults([]);
+        }}
+        footer={null}
+        width={800}
+      >
+        <Input.Search
+          placeholder="输入关键词搜索笔记"
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          onSearch={handleSearch}
+          loading={searching}
+          enterButton
+        />
+        <div style={{ marginTop: '16px' }}>
+          <List
+            itemLayout="horizontal"
+            dataSource={searchResults}
+            loading={searching}
+            renderItem={(item) => {
+              const category = categories.find(
+                (cat) => cat.id === item.category_id,
+              );
+
+              return (
+                <List.Item>
+                  <List.Item.Meta
+                    description={
+                      <Row align="middle">
+                        <Col flex="300px">
+                          <Button
+                            type="link"
+                            style={{ fontWeight: 500, color: 'black' }}
+                            onClick={() => {
+                              navigate(`/notes/${item.id}`);
+                              setSearchModalVisible(false);
+                            }}
+                          >
+                            {item.title}
+                          </Button>
+                        </Col>
+                        <Col flex="auto">
+                          <Space size={[4, 8]} wrap>
+                            {item.tags.map((tag) => (
+                              <Tag key={tag}>{tag}</Tag>
+                            ))}
+                          </Space>
+                        </Col>
+                        <Col flex="100px">
+                          {category && (
+                            <span className="text-gray-500 text-sm ml-4">
+                              {user.username} / {category.name}
+                            </span>
+                          )}
+                        </Col>
+                      </Row>
+                    }
+                  />
+                </List.Item>
+              );
+            }}
+          />
+        </div>
+      </Modal>
 
       {user && (
         <div style={{ padding: '16px', textAlign: 'center' }}>

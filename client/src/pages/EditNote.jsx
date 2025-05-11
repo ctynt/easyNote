@@ -53,7 +53,7 @@ const EditNote = () => {
       <Navbar />
       <Layout
         style={{
-          marginLeft: 200,
+          marginLeft: 250,
           height: '100vh',
         }}
       >

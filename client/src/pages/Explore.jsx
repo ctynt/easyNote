@@ -29,8 +29,7 @@ const Explore = () => {
   return (
     <Layout style={{ backgroundColor: '#f9fafb' }}>
       <Navbar />
-      <Layout.Content style={{ marginLeft: '200px' }}>
-        {' '}
+      <Layout.Content style={{ marginLeft: '250px' }}>
         <div style={{ padding: '24px' }}>
           <Title level={2}>发现笔记</Title>
           <Row gutter={[16, 16]}>
@@ -45,9 +44,9 @@ const Explore = () => {
                     <Title level={4} ellipsis={{ rows: 2 }}>
                       {note.title}
                     </Title>
-                    <Text type="secondary" ellipsis={{ rows: 3 }}>
+                    {/* <Text type="secondary" ellipsis={{ rows: 3 }}>
                       {note.content}
-                    </Text>
+                    </Text> */}
                     <Space
                       style={{ width: '100%', justifyContent: 'space-between' }}
                     >

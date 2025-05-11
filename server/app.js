@@ -6,7 +6,7 @@ import noteRoutes from "./routes/noteRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import translateRoutes from "./routes/translateRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
-
+import uploadRoutes from "./routes/uploadRoutes.js";
 dotenv.config();
 const app = express();
 const allowedOrigins = ["http://localhost:5173"];
@@ -32,4 +32,5 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/translate", translateRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/upload", uploadRoutes);
 export default app;

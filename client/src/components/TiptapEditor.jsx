@@ -17,7 +17,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import { translateText } from '@/api/translateApi';
 import { message } from 'antd';
 import './TiptapEditor.css';
-
+import { uploadImage } from '../api/uploadApi';
 const MenuBar = ({ editor }) => {
   if (!editor) {
     return null;
@@ -191,12 +191,40 @@ const MenuBar = ({ editor }) => {
       >
         链接
       </button>
+      <input
+        type="file"
+        id="image-upload"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={async (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            try {
+              message.loading('正在上传图片...', 0);
+              const response = await uploadImage(file);
+              if (response.data.success) {
+                editor
+                  .chain()
+                  .focus()
+                  .setImage({ src: response.data.url })
+                  .run();
+                message.destroy();
+                message.success('图片上传成功');
+              } else {
+                throw new Error('上传失败');
+              }
+            } catch (error) {
+              message.destroy();
+              message.error('图片上传失败');
+              console.error('Failed to upload image:', error);
+            }
+            e.target.value = null; // 清空input的值，允许上传相同的图片
+          }
+        }}
+      />
       <button
         onClick={() => {
-          const url = window.prompt('输入图片URL');
-          if (url) {
-            editor.chain().focus().setImage({ src: url }).run();
-          }
+          document.getElementById('image-upload').click();
         }}
         title="添加图片"
       >
