@@ -1,6 +1,7 @@
 // src/pages/CategoryNotes.jsx
 import React, { useState, useEffect } from 'react';
 import CommentList from '@/components/CommentList';
+import ActionButtons from '@/components/ActionButtons';
 import {
   List,
   Tag,
@@ -23,6 +24,8 @@ import {
   HomeOutlined,
   TranslationOutlined,
   ShareAltOutlined,
+  LockOutlined,
+  UnlockOutlined,
 } from '@ant-design/icons';
 import { generateShareLink, copyToClipboard } from '@/utils/shareUtils';
 import {
@@ -31,6 +34,7 @@ import {
   getNote,
   updateNote,
 } from '@/api/noteApi';
+import { getCategory, updateCategory } from '@/api/categoryApi';
 import { translateText } from '@/api/translateApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -49,7 +53,7 @@ const CategoryNotes = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [translationVisible, setTranslationVisible] = useState(false);
   const [translatedText, setTranslatedText] = useState('');
-
+  const [isPublic, setIsPublic] = useState();
   // 如果未登录，跳转登录页
   useEffect(() => {
     if (!user || !user.id) {
@@ -64,6 +68,15 @@ const CategoryNotes = () => {
       setSelectedNote(response.data);
     } catch (error) {
       console.error('Failed to fetch note detail:', error);
+    }
+  };
+
+  const fetchStatus = async () => {
+    try {
+      const response = await getCategory(categoryId);
+      setIsPublic(response.data.is_public);
+    } catch (error) {
+      console.error('Failed to fetch category status:', error);
     }
   };
 
@@ -86,6 +99,7 @@ const CategoryNotes = () => {
 
     if (user && user.id) {
       fetchNotesByCategory();
+      fetchStatus();
     }
   }, [user, categoryId]);
 
@@ -243,14 +257,44 @@ const CategoryNotes = () => {
           }}
         >
           <div style={{ padding: '16px' }}>
-            <Button
-              type="primary"
-              icon={<HomeOutlined />}
-              onClick={() => navigate('/')}
-              style={{ marginBottom: '16px' }}
-            >
-              返回主页
-            </Button>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Button
+                type="primary"
+                icon={<HomeOutlined />}
+                onClick={() => navigate('/')}
+                style={{ marginBottom: '8px' }}
+              >
+                返回主页
+              </Button>
+              <Button
+                onClick={async () => {
+                  try {
+                    const newIsPublic = !isPublic; // 直接基于 isPublic 反转
+                    const response = await updateCategory(categoryId, {
+                      is_public: newIsPublic,
+                    });
+
+                    setIsPublic(response.data.is_public); // 只维护 isPublic 状态
+
+                    message.success(
+                      response.data.is_public
+                        ? '分类已设为公开'
+                        : '分类已设为私密',
+                    );
+                  } catch (error) {
+                    console.error(
+                      'Failed to toggle category visibility:',
+                      error,
+                    );
+                    message.error('切换分类状态失败');
+                  }
+                }}
+                icon={isPublic ? <UnlockOutlined /> : <LockOutlined />}
+                style={{ marginBottom: '16px' }}
+              >
+                {isPublic ? '设为私密' : '设为公开'}
+              </Button>
+            </Space>
             <Collapse defaultActiveKey={['1']} ghost>
               <Collapse.Panel header="目录" key="1">
                 <List
@@ -338,7 +382,11 @@ const CategoryNotes = () => {
                     }
                   }}
                 />
+                <div style={{ marginTop: '120px' }}>
+                  <ActionButtons noteId={selectedNote.id} />
+                </div>
               </FloatButton.Group>
+
               <div
                 style={{
                   padding: '12px 24px',

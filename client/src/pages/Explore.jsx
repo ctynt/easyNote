@@ -1,13 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { getNotesList } from '../api/noteApi';
+import { getBatchNoteStats } from '../api/statsApi';
 import { Card, Avatar, Space, Typography, Row, Col, Layout } from 'antd';
-import { MessageOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  MessageOutlined,
+  UserOutlined,
+  LikeOutlined,
+  StarOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import TurndownService from 'turndown';
 const { Text, Title } = Typography;
+
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+});
+
+const removeMarkdownSyntax = (text) => {
+  return text
+    .replace(/#{1,6}\s/g, '') // 移除标题标记
+    .replace(/[\*_]{1,3}([^\*_]+)[\*_]{1,3}/g, '$1') // 移除加粗和斜体
+    .replace(/^[\-\*\+]\s/gm, '') // 移除列表标记
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // 移除链接，保留文本
+    .replace(/`{1,3}[^`]*`{1,3}/g, '') // 移除代码块
+    .replace(/^>\s/gm, '') // 移除引用标记
+    .trim();
+};
 
 const Explore = () => {
   const [notes, setNotes] = useState([]);
+  const [noteStats, setNoteStats] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,6 +39,11 @@ const Explore = () => {
       try {
         const response = await getNotesList();
         setNotes(response.data);
+
+        // 获取所有笔记的统计数据
+        const noteIds = response.data.map((note) => note.id);
+        const statsResponse = await getBatchNoteStats(noteIds);
+        setNoteStats(statsResponse.data);
       } catch (error) {
         console.error('Error fetching notes:', error);
       }
@@ -44,9 +73,11 @@ const Explore = () => {
                     <Title level={4} ellipsis={{ rows: 2 }}>
                       {note.title}
                     </Title>
-                    {/* <Text type="secondary" ellipsis={{ rows: 3 }}>
-                      {note.content}
-                    </Text> */}
+                    <Text type="secondary" ellipsis={{ rows: 3 }}>
+                      {removeMarkdownSyntax(
+                        turndownService.turndown(note.content),
+                      )}
+                    </Text>
                     <Space
                       style={{ width: '100%', justifyContent: 'space-between' }}
                     >
@@ -56,11 +87,25 @@ const Explore = () => {
                           icon={<UserOutlined />}
                           src={note.avatar_url}
                         />
-                        <Text type="secondary">{note.username}</Text>
+                        <Text type="secondary">{note.nickname}</Text>
                       </Space>
                       <Space>
-                        <MessageOutlined />
-                        <Text type="secondary">{note.comment_count}</Text>
+                        <Space>
+                          <MessageOutlined />
+                          <Text type="secondary">{note.comment_count}</Text>
+                        </Space>
+                        <Space>
+                          <LikeOutlined />
+                          <Text type="secondary">
+                            {noteStats[note.id]?.likeCount || 0}
+                          </Text>
+                        </Space>
+                        <Space>
+                          <StarOutlined />
+                          <Text type="secondary">
+                            {noteStats[note.id]?.favoriteCount || 0}
+                          </Text>
+                        </Space>
                       </Space>
                     </Space>
                   </Space>

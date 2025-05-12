@@ -11,7 +11,9 @@ import {
   Space,
   Row,
   Col,
+  message,
 } from 'antd';
+import UserProfileForm from './UserProfileForm';
 import {
   HomeOutlined,
   BookOutlined,
@@ -34,6 +36,7 @@ const Navbar = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -120,8 +123,24 @@ const Navbar = () => {
         backgroundColor: '#fff',
       }}
     >
-      <div style={{ padding: '16px', textAlign: 'center' }}>
-        <h1 style={{ color: '#333', margin: 0 }}>笔记应用</h1>
+      <div
+        style={{
+          padding: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <h1 style={{ color: '#333', margin: 0 }}>EasyNote</h1>
+        <img
+          src={user.avatar_url}
+          style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            cursor: 'pointer',
+          }}
+          onClick={() => setProfileModalVisible(true)}
+        />
       </div>
       <Menu
         mode="inline"
@@ -139,6 +158,12 @@ const Navbar = () => {
             label: '首页',
             icon: <HomeOutlined />,
             onClick: () => navigate('/'),
+          },
+          {
+            key: 'search',
+            label: '搜索',
+            icon: <SearchOutlined />,
+            onClick: () => setSearchModalVisible(true),
           },
           {
             key: 'categories',
@@ -161,12 +186,6 @@ const Navbar = () => {
             label: '逛逛',
             icon: <BookOutlined />,
             onClick: () => navigate('/explore'),
-          },
-          {
-            key: 'search',
-            label: '搜索',
-            icon: <SearchOutlined />,
-            onClick: () => setSearchModalVisible(true),
           },
         ]}
       />
@@ -224,10 +243,10 @@ const Navbar = () => {
                             ))}
                           </Space>
                         </Col>
-                        <Col flex="100px">
+                        <Col flex="auto">
                           {category && (
-                            <span className="text-gray-500 text-sm ml-4">
-                              {user.username} / {category.name}
+                            <span className="text-gray-500 text-sm ml-4 mr-4">
+                              {user.nickname} / {category.name}
                             </span>
                           )}
                         </Col>
@@ -239,6 +258,20 @@ const Navbar = () => {
             }}
           />
         </div>
+      </Modal>
+
+      {/* 用户信息编辑弹窗 */}
+      <Modal
+        title="编辑个人信息"
+        open={profileModalVisible}
+        onCancel={() => setProfileModalVisible(false)}
+        footer={null}
+      >
+        <UserProfileForm
+          onSuccess={() => {
+            setProfileModalVisible(false);
+          }}
+        />
       </Modal>
 
       {user && (

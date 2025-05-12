@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tag, Layout, Button, message, Divider } from 'antd';
+import ActionButtons from '@/components/ActionButtons';
 import { ShareAltOutlined } from '@ant-design/icons';
 import { getNote } from '@/api/noteApi';
 import { generateShareLink, copyToClipboard } from '@/utils/shareUtils';
@@ -170,6 +171,7 @@ const Note = () => {
               <CommentList noteId={id} />
             </div>
           </div>
+
           <Sider
             width={250}
             theme="light"
@@ -201,6 +203,7 @@ const Note = () => {
           </Sider>
         </Content>
       </Layout>
+      <ActionButtons noteId={note.id} />
     </Layout>
   );
 };

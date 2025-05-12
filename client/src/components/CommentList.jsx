@@ -14,7 +14,6 @@ const CommentList = ({ noteId }) => {
     try {
       const response = await getComments(noteId);
       setComments(response.data);
-      console.log('CommentsData:', response.data); // Add this line to log the comments t
     } catch (error) {
       console.error('Failed to fetch comments:', error);
       message.error('获取评论失败');
@@ -26,7 +25,6 @@ const CommentList = ({ noteId }) => {
       fetchComments();
     }
   }, [noteId]);
-  console.log('Comments:', comments); // Add this line to log the comments t
   // 提交评论
   const handleSubmit = async () => {
     if (!commentContent.trim()) {
@@ -51,7 +49,6 @@ const CommentList = ({ noteId }) => {
       setSubmitting(false);
     }
   };
-
   // 删除评论
   const handleDelete = async (commentId) => {
     try {
@@ -95,8 +92,8 @@ const CommentList = ({ noteId }) => {
             }
           >
             <List.Item.Meta
-              avatar={<Avatar src={item.avatar_url} alt={item.username} />}
-              title={<span>{item.username}</span>}
+              avatar={<Avatar src={item.avatar_url} alt={item.nickname} />}
+              title={<span>{item.nickname}</span>}
               description={
                 <div>
                   <div>{item.content}</div>

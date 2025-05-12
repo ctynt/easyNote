@@ -72,7 +72,7 @@ const NoteList = ({ notes, categories, onDeleteNote }) => {
                     <Col flex="100px">
                       {category && (
                         <span className="text-gray-500 text-sm ml-4">
-                          {user.username} / {category.name}
+                          {user.nickname} / {category.name}
                         </span>
                       )}
                     </Col>

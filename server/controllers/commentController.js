@@ -5,7 +5,7 @@ export const getComments = async (req, res) => {
   try {
     const { note_id } = req.params;
     const [rows] = await pool.query(
-      "SELECT c.*, u.username, u.avatar_url FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.note_id = ? ORDER BY c.created_at DESC",
+      "SELECT c.*, u.id,u.nickname, u.avatar_url FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.note_id = ? ORDER BY c.created_at DESC",
       [note_id]
     );
     res.status(200).json(rows);
