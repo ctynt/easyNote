@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getNotesList } from '../api/noteApi';
 import { getBatchNoteStats } from '../api/statsApi';
+import { getPublicCategories } from '../api/categoryApi';
 import { Card, Avatar, Space, Typography, Row, Col, Layout } from 'antd';
 import {
   MessageOutlined,
@@ -32,23 +33,28 @@ const removeMarkdownSyntax = (text) => {
 const Explore = () => {
   const [notes, setNotes] = useState([]);
   const [noteStats, setNoteStats] = useState({});
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchNotes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getNotesList();
-        setNotes(response.data);
+        const [notesResponse, categoriesResponse] = await Promise.all([
+          getNotesList(),
+          getPublicCategories(),
+        ]);
+        setNotes(notesResponse.data);
+        setCategories(categoriesResponse.data);
 
         // 获取所有笔记的统计数据
-        const noteIds = response.data.map((note) => note.id);
+        const noteIds = notesResponse.data.map((note) => note.id);
         const statsResponse = await getBatchNoteStats(noteIds);
         setNoteStats(statsResponse.data);
       } catch (error) {
-        console.error('Error fetching notes:', error);
+        console.error('Error fetching data:', error);
       }
     };
-    fetchNotes();
+    fetchData();
   }, []);
 
   const handleNoteClick = (noteId) => {
@@ -60,6 +66,44 @@ const Explore = () => {
       <Navbar />
       <Layout.Content style={{ marginLeft: '250px' }}>
         <div style={{ padding: '24px' }}>
+          <Title level={2}>发现知识库</Title>
+          <Row gutter={[16, 16]} className="mb-8">
+            {categories.map((category) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={category.id}>
+                <Card
+                  hoverable
+                  onClick={() => navigate(`/notes/categories/${category.id}`)}
+                  cover={
+                    category.cover && (
+                      <img
+                        alt={category.name}
+                        src={category.cover}
+                        style={{ height: 200, objectFit: 'cover' }}
+                      />
+                    )
+                  }
+                >
+                  <Card.Meta
+                    title={category.name}
+                    description={
+                      <div>
+                        <p className="text-gray-600">{category.description}</p>
+                        <Space className="mt-2">
+                          <Avatar
+                            size="small"
+                            src={category.avatar_url}
+                            icon={<UserOutlined />}
+                          />
+                          <Text type="secondary">{category.nickname}</Text>
+                        </Space>
+                      </div>
+                    }
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
           <Title level={2}>发现笔记</Title>
           <Row gutter={[16, 16]}>
             {notes.map((note) => (

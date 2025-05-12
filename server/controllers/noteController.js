@@ -38,7 +38,7 @@ export const getNotes = async (req, res) => {
 export const getNotesList = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT n.*, u.username, u.avatar_url, 
+      `SELECT n.*, u.nickname, u.avatar_url, 
       (SELECT COUNT(*) FROM comments c WHERE c.note_id = n.id) as comment_count 
       FROM notes n 
       LEFT JOIN users u ON n.user_id = u.id 

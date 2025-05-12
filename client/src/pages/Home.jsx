@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Layout,
-  Typography,
-  Button,
-  Modal,
-  Divider,
-  Input,
-  message,
-} from 'antd';
+import { Layout, Typography, Button, Divider, message } from 'antd';
+import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 
 import Navbar from '@/components/Navbar';
 import { useStore } from '@/store/userStore';
@@ -16,6 +9,7 @@ import { getCategories, createCategory } from '@/api/categoryApi';
 import { useNavigate } from 'react-router-dom';
 import NoteList from '@/components/NoteList';
 const { Title } = Typography;
+import CreateCategoryModal from '@/components/CreateCategoryModal';
 
 const Home = () => {
   const { user } = useStore();
@@ -23,8 +17,6 @@ const Home = () => {
   const [notes, setNotes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [createCategoryModal, setCreateCategoryModal] = useState(false);
-  const [categoryNameInput, setCategoryNameInput] = useState('');
-
   // 统计每个分类有多少篇笔记
   const getNoteCountsByCategory = (notes) => {
     const counts = {};
@@ -105,7 +97,26 @@ const Home = () => {
                 key={item.id}
                 className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200"
               >
-                <h3 className="text-lg font-medium mb-2">{item.name}</h3>
+                {item.cover && (
+                  <img
+                    src={item.cover}
+                    alt={item.name}
+                    className="w-full h-32 object-cover rounded-md mb-2"
+                  />
+                )}
+                {/* {item.description && (
+                  <p className="text-gray-600 text-sm mb-2">
+                    {item.description}
+                  </p>
+                )} */}
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-medium">{item.name}</h3>
+                  {item.is_public ? (
+                    <UnlockOutlined className="text-green-500" />
+                  ) : (
+                    <LockOutlined className="text-gray-500" />
+                  )}
+                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 text-sm">
                     {noteCounts[item.id] || 0} 篇文章
@@ -138,32 +149,11 @@ const Home = () => {
           />
 
           {/* 新建知识库弹窗 */}
-          <Modal
-            title="新建知识库"
+          <CreateCategoryModal
             open={createCategoryModal}
-            onOk={async () => {
-              try {
-                await createCategory({ name: categoryNameInput }, user.id);
-                message.success('知识库创建成功');
-                await fetchCategories();
-                setCreateCategoryModal(false);
-                setCategoryNameInput('');
-              } catch (error) {
-                console.error('Failed to create category:', error);
-                message.error('创建知识库失败');
-              }
-            }}
-            onCancel={() => {
-              setCreateCategoryModal(false);
-              setCategoryNameInput('');
-            }}
-          >
-            <Input
-              placeholder="请输入知识库名称"
-              value={categoryNameInput}
-              onChange={(e) => setCategoryNameInput(e.target.value)}
-            />
-          </Modal>
+            onCancel={() => setCreateCategoryModal(false)}
+            onSuccess={fetchCategories}
+          />
         </Layout.Content>
       </Layout>
     </Layout>

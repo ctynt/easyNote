@@ -191,7 +191,7 @@ const Navbar = () => {
       />
 
       <Modal
-        title="搜索笔记"
+        title="搜索"
         open={searchModalVisible}
         onCancel={() => {
           setSearchModalVisible(false);
@@ -202,7 +202,7 @@ const Navbar = () => {
         width={800}
       >
         <Input.Search
-          placeholder="输入关键词搜索笔记"
+          placeholder="输入关键词搜索笔记/知识库"
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
           onSearch={handleSearch}

@@ -19,3 +19,7 @@ export const updateCategory = async (categoryId, categoryData) => {
 export const deleteCategory = async (categoryId) => {
   return axiosInstance.delete(`/categories/${categoryId}`);
 };
+
+export const getPublicCategories = async () => {
+  return axiosInstance.get('/categories/public');
+};
