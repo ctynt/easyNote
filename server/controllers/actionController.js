@@ -4,18 +4,27 @@ import pool from "../config/db.js";
 export const getActionCounts = async (req, res) => {
   try {
     const { noteId } = req.params;
-    const [counts] = await pool.query(
-      `SELECT 
-        SUM(type = 0) as like_count,
-        SUM(type = 1) as favorite_count
-      FROM actions 
-      WHERE note_id = ?`,
+
+    // 获取点赞数量（type = 0）
+    const [likes] = await pool.query(
+      `SELECT COUNT(*) AS like_count
+       FROM actions 
+       WHERE note_id = ? AND type = 0`,
+      [noteId]
+    );
+
+    // 获取收藏数量，从 star_content 中统计，去重用户
+    const [favorites] = await pool.query(
+      `SELECT COUNT(DISTINCT s.user_id) AS favorite_count
+       FROM star_content sc
+       JOIN stars s ON sc.star_id = s.id
+       WHERE sc.note_id = ?`,
       [noteId]
     );
 
     res.status(200).json({
-      likeCount: counts[0].like_count || 0,
-      favoriteCount: counts[0].favorite_count || 0,
+      likeCount: likes[0].like_count || 0,
+      favoriteCount: favorites[0].favorite_count || 0,
     });
   } catch (error) {
     console.error("Get action counts failed:", error);
@@ -49,27 +58,28 @@ export const createAction = async (req, res) => {
   }
 };
 
-// controllers/actionController.js
 export const getActionStatus = async (req, res) => {
   try {
-    const { userId, noteId } = req.params; // 👈 param 名字和 router 一致
+    const { userId, noteId } = req.params;
 
     console.log(`查询状态 -> note_id: ${noteId} user_id: ${userId}`);
 
-    const [actions] = await pool.query(
-      "SELECT type FROM actions WHERE user_id = ? AND note_id = ?",
+    // 查询点赞状态（actions 表）
+    const [likeRows] = await pool.query(
+      "SELECT 1 FROM actions WHERE user_id = ? AND note_id = ? AND type = 0 LIMIT 1",
+      [userId, noteId]
+    );
+
+    // 查询收藏状态（star_content 表）
+    const [starRows] = await pool.query(
+      "SELECT 1 FROM star_content WHERE user_id = ? AND note_id = ? LIMIT 1",
       [userId, noteId]
     );
 
     const status = {
-      liked: false,
-      favorited: false,
+      liked: likeRows.length > 0,
+      favorited: starRows.length > 0,
     };
-
-    actions.forEach((action) => {
-      if (action.type === 0) status.liked = true;
-      if (action.type === 1) status.favorited = true;
-    });
 
     res.status(200).json(status);
   } catch (error) {

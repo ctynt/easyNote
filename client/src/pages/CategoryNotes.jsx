@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import CommentList from '@/components/CommentList';
 import ActionButtons from '@/components/ActionButtons';
+import EditCategoryModal from '@/components/EditCategoryModal';
 import {
   List,
   Tag,
@@ -54,6 +55,8 @@ const CategoryNotes = () => {
   const [translationVisible, setTranslationVisible] = useState(false);
   const [translatedText, setTranslatedText] = useState('');
   const [isPublic, setIsPublic] = useState();
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [categoryData, setCategoryData] = useState();
   // 如果未登录，跳转登录页
   useEffect(() => {
     if (!user || !user.id) {
@@ -71,12 +74,13 @@ const CategoryNotes = () => {
     }
   };
 
-  const fetchStatus = async () => {
+  const fetchCategoryData = async () => {
     try {
       const response = await getCategory(categoryId);
       setIsPublic(response.data.is_public);
+      setCategoryData(response.data);
     } catch (error) {
-      console.error('Failed to fetch category status:', error);
+      console.error('Failed to fetch category data:', error);
     }
   };
 
@@ -99,7 +103,7 @@ const CategoryNotes = () => {
 
     if (user && user.id) {
       fetchNotesByCategory();
-      fetchStatus();
+      fetchCategoryData();
     }
   }, [user, categoryId]);
 
@@ -139,18 +143,22 @@ const CategoryNotes = () => {
         userId: user.id,
       };
       await updateNote(selectedNote.id, updatedNoteData);
-      message.success('笔记更新成功');
+      // message.success('笔记更新成功');
       setSelectedNote(updatedNoteData);
 
       // 刷新笔记列表
       const fetchedNotes = await getNotesByCategory(user.id, categoryId);
       setNotes(fetchedNotes.data);
-      navigate(`/notes/categories/${categoryId}`);
-      setIsEditing(false);
+      setIsEditing(true);
     } catch (error) {
       console.error('Failed to update note:', error);
       message.error('更新笔记失败');
     }
+  };
+
+  const handleExitEditing = () => {
+    message.success('更新笔记成功');
+    setIsEditing(false);
   };
 
   // 导出 Markdown
@@ -202,6 +210,7 @@ const CategoryNotes = () => {
     message.success('笔记已导出为Markdown文件');
   };
 
+  console.log('categoryData:', categoryData);
   // 目录项操作
   const renderPopoverContent = (item) => (
     <>
@@ -266,34 +275,48 @@ const CategoryNotes = () => {
               >
                 返回主页
               </Button>
-              <Button
-                onClick={async () => {
-                  try {
-                    const newIsPublic = !isPublic; // 直接基于 isPublic 反转
-                    const response = await updateCategory(categoryId, {
-                      is_public: newIsPublic,
-                    });
-
-                    setIsPublic(response.data.is_public); // 只维护 isPublic 状态
-
-                    message.success(
-                      response.data.is_public
-                        ? '分类已设为公开'
-                        : '分类已设为私密',
-                    );
-                  } catch (error) {
-                    console.error(
-                      'Failed to toggle category visibility:',
-                      error,
-                    );
-                    message.error('切换分类状态失败');
-                  }
-                }}
-                icon={isPublic ? <UnlockOutlined /> : <LockOutlined />}
-                style={{ marginBottom: '16px' }}
+              <Space
+                direction="vertical"
+                style={{ width: '100%', marginBottom: '16px' }}
               >
-                {isPublic ? '设为私密' : '设为公开'}
-              </Button>
+                {categoryData && categoryData.user_id === user.id ? (
+                  <div style={{ display: 'flex' }}>
+                    <Button
+                      className="mr-2"
+                      onClick={() => setEditModalVisible(true)}
+                    >
+                      编辑知识库
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        try {
+                          const newIsPublic = !isPublic;
+                          const response = await updateCategory(categoryId, {
+                            is_public: newIsPublic,
+                          });
+
+                          setIsPublic(response.data.is_public);
+
+                          message.success(
+                            response.data.is_public
+                              ? '分类已设为公开'
+                              : '分类已设为私密',
+                          );
+                        } catch (error) {
+                          console.error(
+                            'Failed to toggle category visibility:',
+                            error,
+                          );
+                          message.error('切换分类状态失败');
+                        }
+                      }}
+                      icon={isPublic ? <UnlockOutlined /> : <LockOutlined />}
+                    >
+                      {isPublic ? '设为私密' : '设为公开'}
+                    </Button>
+                  </div>
+                ) : null}
+              </Space>
             </Space>
             <Collapse defaultActiveKey={['1']} ghost>
               <Collapse.Panel header="目录" key="1">
@@ -309,12 +332,23 @@ const CategoryNotes = () => {
                           : ''
                       }
                       actions={[
-                        <Popover
-                          content={() => renderPopoverContent(item)}
-                          trigger="hover"
-                        >
-                          <Button type="link" icon={<span>⋮</span>} />
-                        </Popover>,
+                        categoryData && categoryData.user_id === user.id ? (
+                          <Popover
+                            content={() => renderPopoverContent(item)}
+                            trigger="hover"
+                          >
+                            <span
+                              style={{
+                                backgroundColor: '#81c784',
+                                color: '#fff',
+                                padding: '8px 12px',
+                                borderRadius: '4px',
+                              }}
+                            >
+                              ⋮
+                            </span>
+                          </Popover>
+                        ) : null,
                       ]}
                     >
                       <List.Item.Meta
@@ -406,17 +440,6 @@ const CategoryNotes = () => {
                 <Space>
                   <Button
                     type="text"
-                    danger
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setModalVisible(true);
-                      setSelectedNoteId(selectedNote.id);
-                    }}
-                  >
-                    删除
-                  </Button>
-                  <Button
-                    type="text"
                     icon={<ShareAltOutlined />}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -435,20 +458,33 @@ const CategoryNotes = () => {
                   >
                     翻译选中文本
                   </Button>
-                  {isEditing ? (
+                  {user.id === selectedNote.userId ? (
                     <>
                       <Button
-                        type="primary"
-                        onClick={() => setIsEditing(false)}
+                        type="text"
+                        danger
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModalVisible(true);
+                          setSelectedNoteId(selectedNote.id);
+                        }}
                       >
-                        取消
+                        删除
                       </Button>
+                      {isEditing ? (
+                        <Button type="primary" onClick={handleExitEditing}>
+                          退出编辑
+                        </Button>
+                      ) : (
+                        <Button
+                          type="primary"
+                          onClick={() => setIsEditing(true)}
+                        >
+                          编辑文档
+                        </Button>
+                      )}
                     </>
-                  ) : (
-                    <Button type="primary" onClick={() => setIsEditing(true)}>
-                      编辑文档
-                    </Button>
-                  )}
+                  ) : null}
                 </Space>
               </div>
               {/* 翻译结果弹窗 */}
@@ -563,6 +599,15 @@ const CategoryNotes = () => {
       >
         <p>确定要删除这篇笔记吗？操作不可撤销。</p>
       </Modal>
+      {/* 编辑知识库弹窗 */}
+      <EditCategoryModal
+        visible={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        onSuccess={() => {
+          fetchCategoryData();
+        }}
+        initialValues={categoryData}
+      />
     </Layout>
   );
 };

@@ -141,16 +141,6 @@ const NoteForm = ({ initialValues, onSubmit, submitButtonText }) => {
           onChange={(value) => setEditorContent(value)} // 只改 editorContent 状态
         />
       </div>
-
-      <Form.Item style={{ marginBottom: 0 }}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{ borderRadius: '6px' }}
-        >
-          {submitButtonText}
-        </Button>
-      </Form.Item>
     </Form>
   );
 };

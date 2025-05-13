@@ -48,6 +48,7 @@ const Explore = () => {
 
         // 获取所有笔记的统计数据
         const noteIds = notesResponse.data.map((note) => note.id);
+        console.log(noteIds);
         const statsResponse = await getBatchNoteStats(noteIds);
         setNoteStats(statsResponse.data);
       } catch (error) {

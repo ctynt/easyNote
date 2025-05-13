@@ -1,6 +1,6 @@
 :root {
   --primary-color: #9575cd;
-  --accent-color: #4a6670;
+  --accent-color: #81c784;
   --background-color: #f9fafb;
   --text-color: #333;
   --border-color: #e6e0f8;
@@ -100,7 +100,7 @@ code {
   margin: 4px !important;
   border-radius: 12px !important;
   padding: 4px 12px !important;
-  background-color: var(--primary-color) !important;
+  background-color: var(--accent-color) !important;
   color: #fff !important;
   border: none !important;
 }

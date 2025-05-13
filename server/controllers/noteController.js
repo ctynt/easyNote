@@ -39,10 +39,12 @@ export const getNotesList = async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT n.*, u.nickname, u.avatar_url, 
-      (SELECT COUNT(*) FROM comments c WHERE c.note_id = n.id) as comment_count 
-      FROM notes n 
-      LEFT JOIN users u ON n.user_id = u.id 
-      ORDER BY n.updated_at DESC`
+        (SELECT COUNT(*) FROM comments c WHERE c.note_id = n.id) as comment_count
+       FROM notes n
+       LEFT JOIN users u ON n.user_id = u.id
+       INNER JOIN categories cat ON n.category_id = cat.id
+       WHERE cat.is_public = 1
+       ORDER BY n.updated_at DESC`
     );
     res.status(200).json(rows);
   } catch (error) {

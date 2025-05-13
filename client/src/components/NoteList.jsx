@@ -71,7 +71,10 @@ const NoteList = ({ notes, categories, onDeleteNote }) => {
                     </Col>
                     <Col flex="100px">
                       {category && (
-                        <span className="text-gray-500 text-sm ml-4">
+                        <span
+                          className="text-gray-500 text-sm ml-4"
+                          style={{ color: '#333' }}
+                        >
                           {user.nickname} / {category.name}
                         </span>
                       )}

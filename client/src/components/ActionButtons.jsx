@@ -8,10 +8,12 @@ import {
 } from '@ant-design/icons';
 import { createAction, getActionStatus } from '@/api/actionApi';
 import { useStore } from '@/store/userStore';
+import StarGroup from './StarGroup';
 
 const ActionButtons = ({ noteId }) => {
   const [liked, setLiked] = useState(null); // 初始状态为 null，避免闪烁
   const [favorited, setFavorited] = useState(null); // 初始状态为 null
+  const [starModalVisible, setStarModalVisible] = useState(false);
   const { user } = useStore();
 
   useEffect(() => {
@@ -66,8 +68,17 @@ const ActionButtons = ({ noteId }) => {
         />
         <FloatButton
           icon={favorited ? <StarFilled /> : <StarOutlined />}
-          onClick={() => handleAction(1)}
-          tooltip={favorited ? '取消收藏' : '收藏'}
+          onClick={() => setStarModalVisible(true)}
+          tooltip="收藏"
+        />
+        <StarGroup
+          visible={starModalVisible}
+          onCancel={() => setStarModalVisible(false)}
+          onSuccess={() => {
+            setFavorited(true);
+            setStarModalVisible(false);
+          }}
+          noteId={noteId}
         />
       </FloatButton.Group>
     </div>

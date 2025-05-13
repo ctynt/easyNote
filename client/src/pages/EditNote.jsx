@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, message } from 'antd';
+import { Layout, message, Button } from 'antd';
 import { getNote, updateNote } from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -35,15 +35,22 @@ const EditNote = () => {
     try {
       const updatedNoteData = {
         ...values,
+        content: EditorContent,
+        tags,
         userId: user.id,
       };
       await updateNote(id, updatedNoteData);
-      message.success('笔记更新成功');
-      navigate(`/notes/${id}`);
+      // message.success('笔记更新成功');
+      // navigate(`/notes/${id}`);
     } catch (error) {
       console.error('Failed to update note:', error);
       message.error('更新笔记失败');
     }
+  };
+
+  const handleExitEditing = () => {
+    message.success('笔记更新成功');
+    navigate(`/notes/${id}`);
   };
 
   if (!note) return <div>Loading...</div>;
@@ -59,11 +66,10 @@ const EditNote = () => {
       >
         <Layout.Content style={{ padding: '24px', background: '#f5f5f5' }}>
           <div style={{ padding: '24px', backgroundColor: '#fff' }}>
-            <NoteForm
-              initialValues={note}
-              onSubmit={handleSubmit}
-              submitButtonText="保存笔记"
-            />
+            <NoteForm initialValues={note} onSubmit={handleSubmit} />
+            <Button onClick={handleExitEditing} style={{ marginLeft: '20px' }}>
+              保存笔记
+            </Button>
           </div>
         </Layout.Content>
       </Layout>

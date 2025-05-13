@@ -10,6 +10,7 @@ import CreateNote from '@/pages/CreateNote';
 import EditNote from '../pages/EditNote';
 import Explore from '../pages/Explore';
 import SharedNote from '@/pages/SharedNote';
+import Stasr from '@/pages/Stars';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -23,6 +24,7 @@ const AppRoutes = () => {
       <Route path="/create-note" element={<CreateNote />} />
       <Route path="/explore" element={<Explore />} />
       <Route path="/shared/:encryptedId" element={<SharedNote />} />
+      <Route path="/stars" element={<Stasr />} />
     </Routes>
   );
 };

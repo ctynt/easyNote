@@ -16,12 +16,14 @@ import {
 import UserProfileForm from './UserProfileForm';
 import {
   HomeOutlined,
-  BookOutlined,
-  FolderOutlined,
-  SearchOutlined,
+  FileTextOutlined,
+  CompassOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  StarOutlined,
 } from '@ant-design/icons';
 import { getCategories } from '@/api/categoryApi';
-import { getNotes } from '@/api/noteApi';
+import { getRecentItems, searchItems } from '@/api/searchApi';
 import { useStore } from '@/store/userStore';
 
 const { Sider } = Layout;
@@ -34,38 +36,39 @@ const Navbar = () => {
   const [openKeys, setOpenKeys] = useState([]); // 👈 控制展开子菜单
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState({
+    notes: [],
+    categories: [],
+  });
   const [searching, setSearching] = useState(false);
+  const [recentItems, setRecentItems] = useState({ notes: [], categories: [] });
   const [profileModalVisible, setProfileModalVisible] = useState(false);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getCategories(user.id);
-        setCategories(response.data);
+        const [categoriesRes, recentItemsRes] = await Promise.all([
+          getCategories(user.id),
+          getRecentItems(user.id),
+        ]);
+        setCategories(categoriesRes.data);
+        setRecentItems(recentItemsRes.data);
       } catch (error) {
-        console.error('Failed to fetch categories:', error);
+        console.error('Failed to fetch data:', error);
       }
     };
-    fetchCategories();
+    fetchData();
   }, []);
 
   const handleSearch = async () => {
     if (!searchKeyword.trim()) return;
     setSearching(true);
     try {
-      const response = await getNotes(user.id);
-      const filteredNotes = response.data.filter(
-        (note) =>
-          note.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-          note.content.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-          note.tags.some((tag) =>
-            tag.toLowerCase().includes(searchKeyword.toLowerCase()),
-          ),
-      );
-      setSearchResults(filteredNotes);
+      const response = await searchItems(user.id, searchKeyword);
+      setSearchResults(response.data);
     } catch (error) {
       console.error('搜索失败:', error);
+      message.error('搜索失败');
     } finally {
       setSearching(false);
     }
@@ -154,38 +157,40 @@ const Navbar = () => {
         }}
         items={[
           {
-            key: 'home',
+            key: '/',
             label: '首页',
             icon: <HomeOutlined />,
             onClick: () => navigate('/'),
           },
           {
-            key: 'search',
-            label: '搜索',
-            icon: <SearchOutlined />,
-            onClick: () => setSearchModalVisible(true),
-          },
-          {
-            key: 'categories',
-            label: '知识库',
-            icon: <FolderOutlined />,
-            children: categories.map((category) => ({
-              key: `category-${category.id}`,
-              label: category.name,
-              onClick: () => navigate(`/notes/categories/${category.id}`),
-            })),
-          },
-          {
-            key: 'notes',
+            key: '/notes',
             label: '笔记',
-            icon: <BookOutlined />,
+            icon: <FileTextOutlined />,
             onClick: () => navigate('/notes'),
           },
           {
-            key: 'explore',
-            label: '逛逛',
-            icon: <BookOutlined />,
+            key: '/stars',
+            label: '收藏',
+            icon: <StarOutlined />,
+            onClick: () => navigate('/stars'),
+          },
+          {
+            key: '/explore',
+            label: '发现',
+            icon: <CompassOutlined />,
             onClick: () => navigate('/explore'),
+          },
+          {
+            key: '/profile',
+            label: '个人中心',
+            icon: <UserOutlined />,
+            onClick: () => navigate('/profile'),
+          },
+          {
+            key: 'logout',
+            label: '退出登录',
+            icon: <LogoutOutlined />,
+            onClick: handleLogout,
           },
         ]}
       />
@@ -210,53 +215,125 @@ const Navbar = () => {
           enterButton
         />
         <div style={{ marginTop: '16px' }}>
-          <List
-            itemLayout="horizontal"
-            dataSource={searchResults}
-            loading={searching}
-            renderItem={(item) => {
-              const category = categories.find(
-                (cat) => cat.id === item.category_id,
-              );
+          {!searchKeyword && (
+            <>
+              <h3>最近编辑的笔记</h3>
+              <List
+                itemLayout="horizontal"
+                dataSource={recentItems.notes}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      title={
+                        <Button
+                          type="link"
+                          style={{ fontWeight: 500, color: 'black' }}
+                          onClick={() => {
+                            navigate(`/notes/${item.id}`);
+                            setSearchModalVisible(false);
+                          }}
+                        >
+                          {item.title}
+                        </Button>
+                      }
+                      description={
+                        <Space size={[4, 8]} wrap>
+                          {item.tags &&
+                            item.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
+                        </Space>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
 
-              return (
-                <List.Item>
-                  <List.Item.Meta
-                    description={
-                      <Row align="middle">
-                        <Col flex="300px">
-                          <Button
-                            type="link"
-                            style={{ fontWeight: 500, color: 'black' }}
-                            onClick={() => {
-                              navigate(`/notes/${item.id}`);
-                              setSearchModalVisible(false);
-                            }}
-                          >
-                            {item.title}
-                          </Button>
-                        </Col>
-                        <Col flex="auto">
-                          <Space size={[4, 8]} wrap>
-                            {item.tags.map((tag) => (
-                              <Tag key={tag}>{tag}</Tag>
-                            ))}
-                          </Space>
-                        </Col>
-                        <Col flex="auto">
-                          {category && (
-                            <span className="text-gray-500 text-sm ml-4 mr-4">
-                              {user.nickname} / {category.name}
-                            </span>
-                          )}
-                        </Col>
-                      </Row>
-                    }
-                  />
-                </List.Item>
-              );
-            }}
-          />
+              <h3 style={{ marginTop: '16px' }}>最近创建的知识库</h3>
+              <List
+                itemLayout="horizontal"
+                dataSource={recentItems.categories}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      title={
+                        <Button
+                          type="link"
+                          style={{ fontWeight: 500, color: 'black' }}
+                          onClick={() => {
+                            navigate(`/notes/categories/${item.id}`);
+                            setSearchModalVisible(false);
+                          }}
+                        >
+                          {item.name}
+                        </Button>
+                      }
+                      description={item.description}
+                    />
+                  </List.Item>
+                )}
+              />
+            </>
+          )}
+
+          {searchKeyword && (
+            <>
+              <h3>笔记</h3>
+              <List
+                itemLayout="horizontal"
+                dataSource={searchResults.notes}
+                loading={searching}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      title={
+                        <Button
+                          type="link"
+                          style={{ fontWeight: 500, color: 'black' }}
+                          onClick={() => {
+                            navigate(`/notes/${item.id}`);
+                            setSearchModalVisible(false);
+                          }}
+                        >
+                          {item.title}
+                        </Button>
+                      }
+                      description={
+                        <Space size={[4, 8]} wrap>
+                          {item.tags &&
+                            item.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
+                        </Space>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+
+              <h3 style={{ marginTop: '16px' }}>知识库</h3>
+              <List
+                itemLayout="horizontal"
+                dataSource={searchResults.categories}
+                loading={searching}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      title={
+                        <Button
+                          type="link"
+                          style={{ fontWeight: 500, color: 'black' }}
+                          onClick={() => {
+                            navigate(`/notes/categories/${item.id}`);
+                            setSearchModalVisible(false);
+                          }}
+                        >
+                          {item.name}
+                        </Button>
+                      }
+                      description={item.description}
+                    />
+                  </List.Item>
+                )}
+              />
+            </>
+          )}
         </div>
       </Modal>
 
@@ -273,14 +350,6 @@ const Navbar = () => {
           }}
         />
       </Modal>
-
-      {user && (
-        <div style={{ padding: '16px', textAlign: 'center' }}>
-          <Button type="link" onClick={handleLogout} style={{ color: 'white' }}>
-            退出登录
-          </Button>
-        </div>
-      )}
     </Sider>
   );
 };

@@ -94,6 +94,7 @@ const Home = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {categories.map((item) => (
               <div
+                onClick={() => navigate(`/notes/categories/${item.id}`)}
                 key={item.id}
                 className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200"
               >
@@ -104,11 +105,6 @@ const Home = () => {
                     className="w-full h-32 object-cover rounded-md mb-2"
                   />
                 )}
-                {/* {item.description && (
-                  <p className="text-gray-600 text-sm mb-2">
-                    {item.description}
-                  </p>
-                )} */}
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-lg font-medium">{item.name}</h3>
                   {item.is_public ? (
@@ -121,12 +117,6 @@ const Home = () => {
                   <span className="text-gray-500 text-sm">
                     {noteCounts[item.id] || 0} 篇文章
                   </span>
-                  <Button
-                    type="link"
-                    onClick={() => navigate(`/notes/categories/${item.id}`)}
-                  >
-                    查看详情
-                  </Button>
                 </div>
               </div>
             ))}

@@ -54,13 +54,21 @@ export const getCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, is_public } = req.body;
+    const { name, is_public, description, cover } = req.body;
     const updateFields = [];
     const updateValues = [];
 
     if (name !== undefined) {
       updateFields.push("name = ?");
       updateValues.push(name);
+    }
+    if (description !== undefined) {
+      updateFields.push("description =?");
+      updateValues.push(description);
+    }
+    if (cover !== undefined) {
+      updateFields.push("cover =?");
+      updateValues.push(cover);
     }
 
     if (is_public !== undefined) {

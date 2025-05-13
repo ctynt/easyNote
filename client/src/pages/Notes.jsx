@@ -66,7 +66,7 @@ const Notes = () => {
           style={{ padding: '24px', minHeight: '100vh', background: '#fff' }}
         >
           <div className="flex justify-between items-center mb-6">
-            <h1>笔记列表</h1>
+            <h2>笔记列表</h2>
             <Button type="primary" onClick={() => navigate('/create-note')}>
               创建笔记
             </Button>

@@ -82,18 +82,11 @@ const CreateCategoryModal = ({ open, onCancel, onSuccess }) => {
               return false;
             }}
           >
-            {coverUrl ? (
-              <img
-                src={coverUrl}
-                alt="cover"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <div>
-                <UploadOutlined />
-                <div style={{ marginTop: 8 }}>上传封面图</div>
-              </div>
-            )}
+            <div>
+              <UploadOutlined />
+              <div style={{ marginTop: 8 }}>上传封面图</div>
+            </div>
+            )
           </Upload>
         </Form.Item>
         <Form.Item
