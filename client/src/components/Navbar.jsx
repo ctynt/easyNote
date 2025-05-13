@@ -19,7 +19,6 @@ import {
   HomeOutlined,
   FileTextOutlined,
   CompassOutlined,
-  UserOutlined,
   LogoutOutlined,
   StarOutlined,
   RobotOutlined,
@@ -188,12 +187,6 @@ const Navbar = () => {
             label: 'AI助手',
             icon: <RobotOutlined />,
             onClick: () => setAiHelperVisible(true),
-          },
-          {
-            key: '/profile',
-            label: '个人中心',
-            icon: <UserOutlined />,
-            onClick: () => navigate('/profile'),
           },
           {
             key: 'logout',

@@ -65,9 +65,6 @@ const EditNote = () => {
               onSubmit={handleSubmit}
               submitButtonText="保存笔记"
             />
-            {/* <Button onClick={handleExitEditing} style={{ marginLeft: '20px' }}>
-              保存笔记
-            </Button> */}
           </div>
         </Layout.Content>
       </Layout>

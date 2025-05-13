@@ -123,9 +123,6 @@ const CreateNote = () => {
             submitButtonText="创建笔记"
             initialValues={formData}
           />
-          <Button onClick={handleExitEditing} style={{ marginLeft: '20px' }}>
-            保存笔记
-          </Button>
         </div>
       </Layout.Content>
     </Layout>

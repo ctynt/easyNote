@@ -27,6 +27,7 @@ import {
   ShareAltOutlined,
   LockOutlined,
   UnlockOutlined,
+  RobotOutlined,
 } from '@ant-design/icons';
 import { generateShareLink, copyToClipboard } from '@/utils/shareUtils';
 import {
@@ -41,7 +42,7 @@ import { useStore } from '@/store/userStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import OutlineExtractor from '@/components/OutlineExtractor';
 import NoteForm from '@/components/NoteForm';
-
+import AIHelper from '@/components/AIHelper';
 const CategoryNotes = () => {
   const { user } = useStore();
   const navigate = useNavigate();
@@ -57,6 +58,7 @@ const CategoryNotes = () => {
   const [isPublic, setIsPublic] = useState();
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [categoryData, setCategoryData] = useState();
+  const [aiHelperVisible, setAiHelperVisible] = useState(false);
   // 如果未登录，跳转登录页
   useEffect(() => {
     if (!user || !user.id) {
@@ -457,6 +459,13 @@ const CategoryNotes = () => {
                   >
                     翻译选中文本
                   </Button>
+                  <Button
+                    type="text"
+                    icon={<RobotOutlined />}
+                    onClick={() => setAiHelperVisible(true)}
+                  >
+                    ai助手
+                  </Button>
                   {user.id === selectedNote.user_id ? (
                     <>
                       <Button
@@ -605,6 +614,10 @@ const CategoryNotes = () => {
           fetchCategoryData();
         }}
         initialValues={categoryData}
+      />
+      <AIHelper
+        visible={aiHelperVisible}
+        onClose={() => setAiHelperVisible(false)}
       />
     </Layout>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Input, Button, message } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
-
+import { chatWithAI } from '../api/aiApi';
 const { TextArea } = Input;
 
 const AIHelper = ({ visible, onClose }) => {
@@ -17,21 +17,9 @@ const AIHelper = ({ visible, onClose }) => {
 
     setLoading(true);
     try {
-      // TODO: 调用后端API获取AI回答
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ question }),
-      });
-
-      if (!response.ok) {
-        throw new Error('请求失败');
-      }
-
-      const data = await response.json();
-      setAnswer(data.answer);
+      const response = await chatWithAI(question);
+      console.log('AI回答:', response.data);
+      setAnswer(response.data.answer);
     } catch (error) {
       console.error('AI请求失败:', error);
       message.error('获取AI回答失败，请稍后重试');
@@ -82,15 +70,7 @@ const AIHelper = ({ visible, onClose }) => {
           }}
         >
           <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{answer}</pre>
-          <Button
-            icon={<CopyOutlined />}
-            onClick={handleCopy}
-            style={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-            }}
-          >
+          <Button icon={<CopyOutlined />} onClick={handleCopy} className="mt-2">
             复制
           </Button>
         </div>

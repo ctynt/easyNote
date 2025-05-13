@@ -79,13 +79,13 @@ const Home = () => {
           style={{ overflow: 'hidden' }}
         >
           {/* 欢迎语 */}
-          <Title level={2} className="mb-8 text-gray-800">
-            欢迎，{user?.nickname || user?.username || '笔记用户'}
-          </Title>
+          <h1 level={2} className="mb-8 text-gray-800">
+            欢迎，{user?.nickname || user?.username || '笔记用户'} 🚀
+          </h1>
 
           {/* 知识库列表 */}
           <div className="flex justify-between items-center mb-4">
-            <Title level={3}>知识库列表</Title>
+            <h2 level={3}>知识库列表</h2>
             <Button type="primary" onClick={() => setCreateCategoryModal(true)}>
               创建知识库
             </Button>
@@ -126,7 +126,7 @@ const Home = () => {
 
           {/* 最近笔记列表 */}
           <div className="flex justify-between items-center mb-4">
-            <Title level={3}>最近笔记</Title>
+            <h2 level={3}>最近笔记</h2>
             <Button type="primary" onClick={() => navigate('/create-note')}>
               创建笔记
             </Button>

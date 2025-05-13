@@ -67,7 +67,7 @@ const Explore = () => {
       <Navbar />
       <Layout.Content style={{ marginLeft: '250px' }}>
         <div style={{ padding: '24px' }}>
-          <Title level={2}>发现知识库</Title>
+          <h2 className="mt-5 font-500 ml-2 mb-2">发现知识库 📚️</h2>
           <Row gutter={[16, 16]} className="mb-8">
             {categories.map((category) => (
               <Col xs={24} sm={12} md={8} lg={6} key={category.id}>
@@ -79,7 +79,7 @@ const Explore = () => {
                       <img
                         alt={category.name}
                         src={category.cover}
-                        style={{ height: 200, objectFit: 'cover' }}
+                        style={{ height: 150, objectFit: 'cover' }}
                       />
                     )
                   }
@@ -105,7 +105,7 @@ const Explore = () => {
             ))}
           </Row>
 
-          <Title level={2}>发现笔记</Title>
+          <h2 className="mt-5 font-500 ml-2 mb-2">发现笔记 🧩</h2>
           <Row gutter={[16, 16]}>
             {notes.map((note) => (
               <Col xs={24} sm={12} md={8} lg={6} key={note.id}>
