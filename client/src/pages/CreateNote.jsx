@@ -84,11 +84,14 @@ const CreateNote = () => {
       };
       await createNote(noteData);
       message.success('笔记创建成功');
-      navigate('/notes');
     } catch (error) {
       console.error('Failed to create note:', error);
       message.error('创建笔记失败');
     }
+  };
+  const handleExitEditing = () => {
+    message.success('笔记更新成功');
+    navigate(`/notes/${id}`);
   };
 
   return (
@@ -120,6 +123,9 @@ const CreateNote = () => {
             submitButtonText="创建笔记"
             initialValues={formData}
           />
+          <Button onClick={handleExitEditing} style={{ marginLeft: '20px' }}>
+            保存笔记
+          </Button>
         </div>
       </Layout.Content>
     </Layout>

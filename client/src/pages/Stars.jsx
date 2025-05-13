@@ -178,7 +178,7 @@ const Stars = () => {
               onClick={(e) => e.stopPropagation()}
               style={{ marginLeft: 8 }}
             >
-              :
+              ⋮
             </Button>
           </Popover>
         </div>

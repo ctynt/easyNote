@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Tag, Select, message } from 'antd';
 import TiptapEditor from './TiptapEditor';
 import { getCategories } from '@/api/categoryApi';
+import { useStore } from '@/store/userStore';
 
 const NoteForm = ({ initialValues, onSubmit, submitButtonText }) => {
   const [tags, setTags] = useState(initialValues?.tags || []);
@@ -11,13 +12,15 @@ const NoteForm = ({ initialValues, onSubmit, submitButtonText }) => {
     initialValues?.content || '',
   ); // 编辑器内部内容
   const [form] = Form.useForm();
-
+  const { user } = useStore();
   // 加载分类
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await getCategories();
+        console.log('user.id', user.id);
+        const response = await getCategories(user.id);
         setCategories(response.data);
+        console.log('Categories:', response.data); // Add this line for debugging purpose
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         message.error('获取分类失败');
@@ -141,6 +144,16 @@ const NoteForm = ({ initialValues, onSubmit, submitButtonText }) => {
           onChange={(value) => setEditorContent(value)} // 只改 editorContent 状态
         />
       </div>
+
+      <Form.Item style={{ marginBottom: 0 }}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          style={{ borderRadius: '6px' }}
+        >
+          {submitButtonText}
+        </Button>
+      </Form.Item>
     </Form>
   );
 };

@@ -454,7 +454,7 @@ const MenuBar = ({ editor }) => {
   );
 };
 
-const TiptapEditor = forwardRef(({ value }, ref) => {
+const TiptapEditor = ({ value, onChange }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -492,15 +492,14 @@ const TiptapEditor = forwardRef(({ value }, ref) => {
       }),
     ],
     content: value || '', // 初始化防止 undefined
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
   });
-
-  useImperativeHandle(ref, () => ({
-    getContent: () => editor?.getHTML() || '',
-  }));
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || '', false);
+      editor.commands.setContent(value || '', false); // 第二个参数 false 表示不推 undo history
     }
   }, [editor, value]);
 
@@ -510,6 +509,6 @@ const TiptapEditor = forwardRef(({ value }, ref) => {
       <EditorContent editor={editor} className="tiptap-editor-content" />
     </div>
   );
-});
+};
 
 export default TiptapEditor;

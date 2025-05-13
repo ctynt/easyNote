@@ -13,6 +13,7 @@ import {
   Col,
   message,
 } from 'antd';
+import AIHelper from './AIHelper';
 import UserProfileForm from './UserProfileForm';
 import {
   HomeOutlined,
@@ -21,6 +22,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   StarOutlined,
+  RobotOutlined,
 } from '@ant-design/icons';
 import { getCategories } from '@/api/categoryApi';
 import { getRecentItems, searchItems } from '@/api/searchApi';
@@ -43,6 +45,7 @@ const Navbar = () => {
   const [searching, setSearching] = useState(false);
   const [recentItems, setRecentItems] = useState({ notes: [], categories: [] });
   const [profileModalVisible, setProfileModalVisible] = useState(false);
+  const [aiHelperVisible, setAiHelperVisible] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,6 +184,12 @@ const Navbar = () => {
             onClick: () => navigate('/explore'),
           },
           {
+            key: 'ai-helper',
+            label: 'AI助手',
+            icon: <RobotOutlined />,
+            onClick: () => setAiHelperVisible(true),
+          },
+          {
             key: '/profile',
             label: '个人中心',
             icon: <UserOutlined />,
@@ -193,6 +202,11 @@ const Navbar = () => {
             onClick: handleLogout,
           },
         ]}
+      />
+
+      <AIHelper
+        visible={aiHelperVisible}
+        onClose={() => setAiHelperVisible(false)}
       />
 
       <Modal

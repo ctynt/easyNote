@@ -225,21 +225,19 @@ export const getAllStarContent = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    // 获取直接收藏的内容
-    const [directContents] = await pool.query(
-      `SELECT DISTINCT n.*, u.nickname, u.avatar_url, 'direct' as source
-         FROM actions a
-         JOIN notes n ON a.note_id = n.id
+    // 获取用户收藏的笔记（来自 star_content 表）
+    const [starredContents] = await pool.query(
+      `SELECT DISTINCT n.*, u.nickname, u.avatar_url, 'star' as source
+         FROM star_content sc
+         JOIN notes n ON sc.note_id = n.id
          JOIN users u ON n.user_id = u.id
-         WHERE a.user_id = ? AND a.type = 1`,
+         WHERE sc.user_id = ?`,
       [userId]
     );
-    const sortedContents = directContents.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
 
-    res.json(sortedContents);
+    res.json(starredContents);
   } catch (error) {
-    handleError(res, error);
+    console.error("Get all starred content failed:", error);
+    res.status(500).json({ error: error.message });
   }
 };

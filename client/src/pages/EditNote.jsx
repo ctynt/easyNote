@@ -35,22 +35,16 @@ const EditNote = () => {
     try {
       const updatedNoteData = {
         ...values,
-        content: EditorContent,
-        tags,
         userId: user.id,
       };
+      console.log('updatedNoteData', updatedNoteData);
       await updateNote(id, updatedNoteData);
-      // message.success('笔记更新成功');
+      message.success('笔记更新成功');
       // navigate(`/notes/${id}`);
     } catch (error) {
       console.error('Failed to update note:', error);
       message.error('更新笔记失败');
     }
-  };
-
-  const handleExitEditing = () => {
-    message.success('笔记更新成功');
-    navigate(`/notes/${id}`);
   };
 
   if (!note) return <div>Loading...</div>;
@@ -66,10 +60,14 @@ const EditNote = () => {
       >
         <Layout.Content style={{ padding: '24px', background: '#f5f5f5' }}>
           <div style={{ padding: '24px', backgroundColor: '#fff' }}>
-            <NoteForm initialValues={note} onSubmit={handleSubmit} />
-            <Button onClick={handleExitEditing} style={{ marginLeft: '20px' }}>
+            <NoteForm
+              initialValues={note}
+              onSubmit={handleSubmit}
+              submitButtonText="保存笔记"
+            />
+            {/* <Button onClick={handleExitEditing} style={{ marginLeft: '20px' }}>
               保存笔记
-            </Button>
+            </Button> */}
           </div>
         </Layout.Content>
       </Layout>

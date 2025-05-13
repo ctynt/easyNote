@@ -143,13 +143,12 @@ const CategoryNotes = () => {
         userId: user.id,
       };
       await updateNote(selectedNote.id, updatedNoteData);
-      // message.success('笔记更新成功');
+      message.success('笔记更新成功');
       setSelectedNote(updatedNoteData);
 
       // 刷新笔记列表
       const fetchedNotes = await getNotesByCategory(user.id, categoryId);
       setNotes(fetchedNotes.data);
-      setIsEditing(true);
     } catch (error) {
       console.error('Failed to update note:', error);
       message.error('更新笔记失败');
@@ -458,7 +457,7 @@ const CategoryNotes = () => {
                   >
                     翻译选中文本
                   </Button>
-                  {user.id === selectedNote.userId ? (
+                  {user.id === selectedNote.user_id ? (
                     <>
                       <Button
                         type="text"
@@ -523,7 +522,6 @@ const CategoryNotes = () => {
                   <NoteForm
                     initialValues={selectedNote}
                     onSubmit={handleSubmit}
-                    submitButtonText="保存笔记"
                   />
                 ) : (
                   <>
