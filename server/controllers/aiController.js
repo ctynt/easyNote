@@ -4,8 +4,7 @@ dotenv.config();
 
 export const chatWithAI = async (req, res) => {
   const openai = new OpenAI({
-    // 若没有配置环境变量，请用百炼API Key将下行替换为：apiKey: "sk-xxx",
-    apiKey: "sk-3b79c6eb074044eba78907a93ecf346b",
+    apiKey: process.env.OPENAI_API_KEY,
     baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
   });
   try {
@@ -19,8 +18,8 @@ export const chatWithAI = async (req, res) => {
       ],
     });
 
-    console.log(JSON.stringify(completion));
     const answer = completion.choices?.[0]?.message?.content || "无响应";
+    console.log("AI Response:", answer);
     res.json({ answer });
   } catch (error) {
     res.status(500).json({ error: "获取AI回答失败" });

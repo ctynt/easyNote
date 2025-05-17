@@ -125,9 +125,18 @@ const CategoryNotes = () => {
     }
   };
 
+  const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+
   // 处理分享功能
-  const handleShare = async (noteId) => {
-    const shareLink = generateShareLink(noteId);
+  const handleShare = (noteId) => {
+    const link = generateShareLink(noteId);
+    setShareLink(link);
+    setShareModalVisible(true);
+  };
+
+  // 处理复制链接
+  const handleCopyLink = async () => {
     const success = await copyToClipboard(shareLink);
     if (success) {
       message.success('分享链接已复制到剪贴板');
@@ -135,6 +144,25 @@ const CategoryNotes = () => {
       message.error('复制失败，请手动复制');
     }
   };
+
+  // 分享链接弹窗
+  const ShareLinkModal = (
+    <Modal
+      title="分享链接"
+      open={shareModalVisible}
+      onCancel={() => setShareModalVisible(false)}
+      footer={[
+        // <Button key="copy" type="primary" onClick={handleCopyLink}>
+        //   复制链接
+        // </Button>,
+        <Button key="close" onClick={() => setShareModalVisible(false)}>
+          关闭
+        </Button>,
+      ]}
+    >
+      <Typography.Paragraph copyable>{shareLink}</Typography.Paragraph>
+    </Modal>
+  );
 
   // 保存更新笔记
   const handleSubmit = async (updatedData) => {
@@ -531,6 +559,7 @@ const CategoryNotes = () => {
                   <NoteForm
                     initialValues={selectedNote}
                     onSubmit={handleSubmit}
+                    submitButtonText="保存笔记"
                   />
                 ) : (
                   <>
@@ -606,6 +635,7 @@ const CategoryNotes = () => {
       >
         <p>确定要删除这篇笔记吗？操作不可撤销。</p>
       </Modal>
+      {ShareLinkModal}
       {/* 编辑知识库弹窗 */}
       <EditCategoryModal
         visible={editModalVisible}

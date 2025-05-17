@@ -52,10 +52,12 @@ const CommentList = ({ noteId }) => {
   // 删除评论
   const handleDelete = async (commentId) => {
     try {
-      await deleteComment(commentId, user?.id);
+      await deleteComment(commentId);
+
       fetchComments(); // 刷新评论列表
       message.success('评论删除成功');
     } catch (error) {
+      console.log('Coment', comments);
       console.error('Failed to delete comment:', error);
       if (error.response?.status === 403) {
         message.error('您没有权限删除此评论');
@@ -75,11 +77,11 @@ const CommentList = ({ noteId }) => {
         renderItem={(item) => (
           <List.Item
             actions={
-              item.user_id === user?.id
+              item.user_id === user.id
                 ? [
                     <Popconfirm
                       title="确定要删除这条评论吗？"
-                      onConfirm={() => handleDelete(item.id)}
+                      onConfirm={() => handleDelete(item.comment_id)}
                       okText="确定"
                       cancelText="取消"
                     >

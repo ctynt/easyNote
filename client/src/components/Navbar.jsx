@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  Layout,
-  Menu,
-  Button,
-  Modal,
-  Input,
-  List,
-  Tag,
-  Space,
-  Row,
-  Col,
-  message,
-} from 'antd';
+import { Layout, Menu, Button, Modal, Input, List, message } from 'antd';
 import AIHelper from './AIHelper';
 import UserProfileForm from './UserProfileForm';
 import {
@@ -22,6 +10,7 @@ import {
   LogoutOutlined,
   StarOutlined,
   RobotOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { getCategories } from '@/api/categoryApi';
 import { getRecentItems, searchItems } from '@/api/searchApi';
@@ -74,6 +63,11 @@ const Navbar = () => {
     } finally {
       setSearching(false);
     }
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchKeyword(e.target.value);
+    setSearchResults({ notes: [], categories: [] });
   };
 
   const handleLogout = () => {
@@ -137,7 +131,7 @@ const Navbar = () => {
       >
         <h1 style={{ color: '#333', margin: 0 }}>EasyNote</h1>
         <img
-          src={user.avatar_url}
+          src={user?.avatar_url}
           style={{
             width: '40px',
             height: '40px',
@@ -163,6 +157,12 @@ const Navbar = () => {
             label: '首页',
             icon: <HomeOutlined />,
             onClick: () => navigate('/'),
+          },
+          {
+            key: '/',
+            label: '搜索',
+            icon: <SearchOutlined />,
+            onClick: () => setSearchModalVisible(true),
           },
           {
             key: '/notes',
@@ -216,7 +216,7 @@ const Navbar = () => {
         <Input.Search
           placeholder="输入关键词搜索笔记/知识库"
           value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
+          onChange={handleSearchInputChange}
           onSearch={handleSearch}
           loading={searching}
           enterButton
@@ -243,12 +243,6 @@ const Navbar = () => {
                           {item.title}
                         </Button>
                       }
-                      description={
-                        <Space size={[4, 8]} wrap>
-                          {item.tags &&
-                            item.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
-                        </Space>
-                      }
                     />
                   </List.Item>
                 )}
@@ -273,7 +267,6 @@ const Navbar = () => {
                           {item.name}
                         </Button>
                       }
-                      description={item.description}
                     />
                   </List.Item>
                 )}
@@ -303,12 +296,6 @@ const Navbar = () => {
                           {item.title}
                         </Button>
                       }
-                      description={
-                        <Space size={[4, 8]} wrap>
-                          {item.tags &&
-                            item.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
-                        </Space>
-                      }
                     />
                   </List.Item>
                 )}
@@ -334,7 +321,6 @@ const Navbar = () => {
                           {item.name}
                         </Button>
                       }
-                      description={item.description}
                     />
                   </List.Item>
                 )}

@@ -5,14 +5,28 @@ export const getComments = async (req, res) => {
   try {
     const { note_id } = req.params;
     const [rows] = await pool.query(
-      "SELECT c.*, u.id,u.nickname, u.avatar_url FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.note_id = ? ORDER BY c.created_at DESC",
+      `
+      SELECT  
+        c.id AS comment_id,  
+        c.content,  
+        c.user_id,  
+        c.created_at,  
+        u.nickname,  
+        u.avatar_url
+      FROM comments c  
+      LEFT JOIN users u ON c.user_id = u.id  
+      WHERE c.note_id = ?  
+      ORDER BY c.created_at DESC
+      `,
       [note_id]
     );
     res.status(200).json(rows);
   } catch (error) {
+    console.error('获取评论失败：', error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // 添加评论
 export const addComment = async (req, res) => {
@@ -39,19 +53,7 @@ export const addComment = async (req, res) => {
 // 删除评论
 export const deleteComment = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { user_id } = req.body; // 用于验证是否是评论作者
-
-    // 验证评论是否属于当前用户
-    const [comment] = await pool.query(
-      "SELECT user_id FROM comments WHERE id = ?",
-      [id]
-    );
-    if (!comment || String(comment[0].user_id) !== String(user_id)) {
-      return res
-        .status(403)
-        .json({ success: false, message: "无权删除此评论" });
-    }
+    const { id} = req.params;
 
     await pool.query("DELETE FROM comments WHERE id = ?", [id]);
     res.json({ success: true, message: "评论删除成功" });

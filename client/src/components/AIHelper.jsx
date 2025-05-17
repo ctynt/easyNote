@@ -70,9 +70,6 @@ const AIHelper = ({ visible, onClose }) => {
           }}
         >
           <pre style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{answer}</pre>
-          <Button icon={<CopyOutlined />} onClick={handleCopy} className="mt-2">
-            复制
-          </Button>
         </div>
       )}
     </Modal>

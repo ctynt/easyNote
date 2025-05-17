@@ -2,16 +2,50 @@ import pool from "../config/db.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { username, email, password, nickname, avatar_url } = req.body;
-    nickname = username;
-    avatar_url = "https://ctynt-oss.oss-cn-hangzhou.aliyuncs.com/origin.png";
-    const [result] = await pool.query(
-      "INSERT INTO users (username,email,password,nickname) VALUES(?,?,?)",
-      [username, email, password, nickname]
+    const { username, email, password } = req.body;
+ 
+    // 验证必填字段
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "用户名、邮箱和密码为必填项" });
+    }
+
+    // 验证邮箱格式
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "邮箱格式不正确" });
+    }
+
+    // 检查用户名是否已存在
+    const [existingUsername] = await pool.query(
+      "SELECT id FROM users WHERE username = ?",
+      [username]
     );
-    res.status(201).json({ id: result.insertId, username, email });
+    if (existingUsername.length > 0) {
+      return res.status(400).json({ error: "用户名已被使用" });
+    }
+
+    // 检查邮箱是否已存在
+    const [existingEmail] = await pool.query(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
+    if (existingEmail.length > 0) {
+      return res.status(400).json({ error: "邮箱已被注册" });
+    }
+
+    const nickname = username;
+    const avatar_url =
+      "https://ctynt-oss.oss-cn-hangzhou.aliyuncs.com/origin.png";
+
+    const [result] = await pool.query(
+      "INSERT INTO users (username,email,password,nickname,avatar_url) VALUES(?,?,?,?,?)",
+      [username, email, password, nickname, avatar_url]
+    );
+    res
+      .status(201)
+      .json({ id: result.insertId, username, email, nickname, avatar_url });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "注册失败，请稍后重试" });
   }
 };
 

@@ -10,8 +10,6 @@ export const addComment = (data) => {
 };
 
 // 删除评论
-export const deleteComment = (commentId, userId) => {
-  return axiosInstance.delete(`/comments/comments/${commentId}`, {
-    data: { user_id: userId },
-  });
+export const deleteComment = (commentId) => {
+  return axiosInstance.delete(`/comments/comments/delete/${commentId}`, {});
 };
